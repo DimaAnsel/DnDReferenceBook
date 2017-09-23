@@ -1,7 +1,13 @@
+################################
+# dbase_manager.py
+# Noah Ansel
+# 2017-09-23
+# ------------------------------
+# Python class that handles querying and modifying the database.
+# Queries are returned packaged into the formats specified in formats.md.
+################################
+
 import sqlite3
-
-
-
 
 class DatabaseManager:
 
@@ -16,15 +22,16 @@ class DatabaseManager:
   ITEM_MAP = ("name", "description", "notes", "img", "rarity")
 
   def __init__(self, dbase = "dnd_ref_book.db"):
+    self._dbase = dbase
     self._book = sqlite3.connect(dbase)
 
   def reset(self):
     self._book.close()
 
     # in case screwed up, reset
-    f = open("dnd_ref_book.db", "w")
+    f = open(self._dbase, "w")
     f.close()
-    self._book = sqlite3.connect("dnd_ref_book.db")
+    self._book = sqlite3.connect(self._dbase)
     self._cursor = book.cursor()
 
     f = open("tables.sql")
