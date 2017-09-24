@@ -125,7 +125,7 @@ If `type` is weapon, also has:
     "ammo":   !<item:simple_item>,
     "range":  !<range:int>,
     "slot":   !<weapon_slot:string>,
-    "weaponAttacks": [
+    "attacks": [
       <attack:simple_attack>,
       ...
     ]
@@ -168,7 +168,7 @@ If `type` is consumable, also has:
 If `isSpell` is true, also has:
 
     "channel": !<channel_duration:int>,
-    "cost": {
+    "costs": {
       {
         "item": <item:simple_item>,
         "qty":  !<quantity:int>
@@ -194,8 +194,8 @@ If `isSpell` is true, also has:
       "notes":  !<notes:string>,
       "creatures": [
         {
-          <creature:simple_creature>,
-          "notes": !<notes:string>
+          "creature": <creature:simple_creature>,
+          "notes":    !<notes:string>
         },
         ...
       ],

@@ -49,3 +49,4 @@ Temporary Items
 # Specific to this project
 test.sql
 *.db
+__pycache__/

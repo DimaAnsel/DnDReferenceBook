@@ -21,6 +21,7 @@ class DatabaseManager:
   # Format string for text surrounded by quotes (").
   QUOTED = "\"{}\""
 
+
   # Fields present in simple creature object.
   SIMPLE_CREATURE_FIELDS = ("name",
                             "img",
@@ -36,7 +37,7 @@ class DatabaseManager:
                           "ac",
                           "xp",
                           "basicAttack")
-  # Fields present in equipment field of full creature object. 
+  # Fields present in equipment field of full creature object.
   CREATURE_EQUIPS_FIELDS = ("item",
                             "equipChance",
                             "notes")
@@ -49,6 +50,12 @@ class DatabaseManager:
                               "notes")
 
 
+  # Item type value marking consumables.
+  ITEM_TYPE_CONSUMABLE = 1
+  # Item type value marking armor.
+  ITEM_TYPE_ARMOR = 2
+  # Item type value marking weapons.
+  ITEM_TYPE_WEAPON = 3
   # Fields present in the simple item object.
   SIMPLE_ITEM_FIELDS = ("name",
                         "img",
@@ -91,6 +98,7 @@ class DatabaseManager:
   # Extra fields for the consumable item object.
   CONSUMABLE_FIELDS = tuple(["effect"])
 
+
   # Fields present in the simple attack object.
   SIMPLE_ATTACK_FIELDS = ("id",
                           "name",
@@ -106,8 +114,10 @@ class DatabaseManager:
                         "isSpell")
   # Extra fields for the spell attack object.
   SPELL_FIELDS = tuple(["channel"])
-  # References present in the spell attack object.
-  SPELL_REFS = {"CastingCosts": "cost"}
+  # Fields present in the costs field of the spell attack object.
+  SPELL_CASTINGCOST_FIELDS = ("item",
+                              "qty")
+
 
   # Fields present in the simple location object.
   SIMPLE_LOCATION_FIELDS = ("name",
@@ -118,10 +128,10 @@ class DatabaseManager:
                           "location",
                           "description",
                           "notes")
-  # References present in the full location object.
-  FULL_LOCATION_REFS = {"Inhabits": ("creatures",
-                                     tuple(["notes"])),
-                        "Stores": "stores"}
+  # Fields present in the creatures field of the full location object.
+  LOCATION_INHABITS_FIELDS = ("creature",
+                              "notes")
+
 
   # Fields present in the simple store object.
   SIMPLE_STORE_FIELDS = ("name",
@@ -132,11 +142,11 @@ class DatabaseManager:
                        "location",
                        "description",
                        "notes")
-  # References present in the full store object.
-  FULL_STORE_REFS = {"Sells", ("sells",
-                               ("qty",
-                                "stockDays",
-                                "price"))}
+  # Fields present in the sells field of the full store object.
+  STORE_SELLS_FIELDS = ("item",
+                        "qty",
+                        "stockDays",
+                        "price")
 
   ########
   # Initializes the manager and opens the connection to the database.
@@ -151,7 +161,7 @@ class DatabaseManager:
   # `test.sql`.
   # 
   # @warning This will delete all saved data. Make a backup if necessary beforehand.
-  def reset(self):
+  def reset(self, tables = "tables.sql", initial = None):
     self._book.close()
 
     # in case screwed up, reset
@@ -160,15 +170,17 @@ class DatabaseManager:
     self._book = sqlite3.connect(self._dbase)
     cursor = self._book.cursor()
 
-    f = open("tables.sql")
+    f = open(tables)
     s = f.read()
     f.close()
     cursor.executescript(s)
 
-    f = open("test.sql")
-    s = f.read()
-    f.close()
-    cursor.executescript(s)
+    if initial != None:
+      f = open(initial)
+      s = f.read()
+      f.close()
+      cursor.executescript(s)
+
     self.commit()
 
   ########
@@ -334,10 +346,52 @@ class DatabaseManager:
       DatabaseManager.QUOTED.format(name)))
     if len(rawData) < 1: # no results
       raise IndexError("'{}' does not match any entries in '{}'.".format(name, self._dbase))
-    
+
     toRet = {}
     for i in range(len(DatabaseManager.FULL_ITEM_FIELDS)):
       toRet[DatabaseManager.FULL_ITEM_FIELDS[i]] = rawData[0][i]
+
+    # Consumable type
+    if toRet["type"] == DatabaseManager.ITEM_TYPE_CONSUMABLE:
+      rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+        ",".join(DatabaseManager.CONSUMABLE_FIELDS),
+        "Consumables",
+        "name",
+        DatabaseManager.QUOTED.format(name)))
+      for i in range(len(DatabaseManager.CONSUMABLE_FIELDS)):
+        toRet[DatabaseManager.CONSUMABLE_FIELDS[i]] = rawData[0][i]
+
+    # Armor type
+    elif toRet["type"] == DatabaseManager.ITEM_TYPE_ARMOR:
+      rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+        ",".join(DatabaseManager.ARMOR_FIELDS),
+        "Armor",
+        "name",
+        DatabaseManager.QUOTED.format(name)))
+      for i in range(len(DatabaseManager.ARMOR_FIELDS)):
+        toRet[DatabaseManager.ARMOR_FIELDS[i]] = rawData[0][i]
+
+    # Weapon type
+    elif toRet["type"] == DatabaseManager.ITEM_TYPE_WEAPON:
+      rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+        ",".join(DatabaseManager.WEAPON_FIELDS),
+        "Weapons",
+        "name",
+        DatabaseManager.QUOTED.format(name)))
+      for i in range(len(DatabaseManager.WEAPON_FIELDS)):
+        toRet[DatabaseManager.WEAPON_FIELDS[i]] = rawData[0][i]
+      # Ammunition
+      if toRet["ammo"] != None:
+        toRet["ammo"] = self.get_simple_item(toRet["ammo"])
+      # Attacks
+      toRet["attacks"] = []
+      rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+        "attackId",
+        "WeaponAttacks",
+        "item",
+        DatabaseManager.QUOTED.format(name)))
+      for item in rawData:
+        toRet["attacks"].append(self.get_simple_attack(item[0]))
 
     # Equips
     toRet["equippedBy"] = []
@@ -428,7 +482,7 @@ class DatabaseManager:
       ",".join(DatabaseManager.SIMPLE_ATTACK_FIELDS),
       "SpecialAttacks",
       "id",
-      DatabaseManager.QUOTED.format(idNum)))
+      idNum))
     if len(rawData) < 1: # no results
       raise IndexError("'{}' does not match any entries in '{}'.".format(idNum, self._dbase))
     
@@ -449,15 +503,56 @@ class DatabaseManager:
       ",".join(DatabaseManager.FULL_ATTACK_FIELDS),
       "SpecialAttacks",
       "id",
-      DatabaseManager.QUOTED.format(idNum)))
+      idNum))
     if len(rawData) < 1: # no results
-      raise IndexError("'{}' does not match any entries in '{}'.".format(name, self._dbase))
+      raise IndexError("'{}' does not match any entries in '{}'.".format(idNum, self._dbase))
     
     toRet = {}
     for i in range(len(DatabaseManager.FULL_ATTACK_FIELDS)):
       toRet[DatabaseManager.FULL_ATTACK_FIELDS[i]] = rawData[0][i]
 
-    # TODO: relation lookups
+    if toRet["isSpell"] == 1:
+      rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+        ",".join(DatabaseManager.SPELL_FIELDS),
+        "Spells",
+        "id",
+        idNum))
+
+      for i in range(len(DatabaseManager.SPELL_FIELDS)):
+        toRet[DatabaseManager.SPELL_FIELDS[i]] = rawData[0][i]
+      # Costs
+      toRet["costs"] = []
+      rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+        ",".join(DatabaseManager.SPELL_CASTINGCOST_FIELDS),
+        "CastingCosts",
+        "spellId",
+        idNum))
+      for item in rawData:
+        temp = {"item": self.get_simple_item(item[0])}
+        for i in range(1, len(DatabaseManager.SPELL_CASTINGCOST_FIELDS)):
+          temp[DatabaseManager.SPELL_CASTINGCOST_FIELDS[i]] = item[i]
+        toRet["costs"].append(temp)
+
+    # Creatures
+    toRet["creatures"] = []
+    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+      "creature",
+      "CreatureAttacks",
+      "attackId",
+      idNum))
+    for item in rawData:
+      toRet["creatures"].append(self.get_simple_creature(item[0]))
+
+    # Weapons
+    toRet["weapons"] = []
+    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+      "item",
+      "WeaponAttacks",
+      "attackId",
+      idNum))
+    for item in rawData:
+      toRet["weapons"].append(self.get_simple_item(item[0]))
+
 
     return toRet
 
@@ -515,7 +610,28 @@ class DatabaseManager:
     for i in range(len(DatabaseManager.FULL_LOCATION_FIELDS)):
       toRet[DatabaseManager.FULL_LOCATION_FIELDS[i]] = rawData[0][i]
 
-    # TODO: relation lookups
+    # Creatures
+    toRet["creatures"] = []
+    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+      ",".join(DatabaseManager.LOCATION_INHABITS_FIELDS),
+      "Inhabits",
+      "location",
+      DatabaseManager.QUOTED.format(name)))
+    for item in rawData:
+      temp = {"creatures": self.get_simple_creature(item[0])}
+      for i in range(1, len(DatabaseManager.LOCATION_INHABITS_FIELDS)):
+        temp[DatabaseManager.LOCATION_INHABITS_FIELDS[i]] = item[i]
+      toRet["creatures"].append(temp)
+
+    # Stores
+    toRet["stores"] = []
+    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+      "name",
+      "Stores",
+      "location",
+      DatabaseManager.QUOTED.format(name)))
+    for item in rawData:
+      toRet["stores"].append(self.get_simple_store(item[0], name))
 
     return toRet
 
@@ -578,8 +694,23 @@ class DatabaseManager:
     toRet = {}
     for i in range(len(DatabaseManager.FULL_STORE_FIELDS)):
       toRet[DatabaseManager.FULL_STORE_FIELDS[i]] = rawData[0][i]
+    
+    toRet["location"] = self.get_simple_location(toRet["location"])
 
-    # TODO: relation lookups
+    # Sells
+    toRet["sells"] = []
+    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+      ",".join(DatabaseManager.STORE_SELLS_FIELDS),
+      "Sells",
+      "(store,location)",
+      "({},{})".format(
+        DatabaseManager.QUOTED.format(name),
+        DatabaseManager.QUOTED.format(location))))
+    for item in rawData:
+      temp = {"item": self.get_simple_item(item[0])}
+      for i in range(1, len(DatabaseManager.STORE_SELLS_FIELDS)):
+        temp[DatabaseManager.STORE_SELLS_FIELDS[i]] = item[i]
+      toRet["sells"].append(temp)
 
     return toRet
 
@@ -602,7 +733,7 @@ if __name__ == "__main__":
   import json
 
   dbm = DatabaseManager()
-  dbm.reset()
+  dbm.reset(initial = "test.sql")
   allCreatures = dbm.get_creature_list()
 
   # print("Creatures:")
@@ -610,16 +741,18 @@ if __name__ == "__main__":
   print("Full creature:")
   print(json.dumps(dbm.get_creature(allCreatures[0]["name"]), indent=2, sort_keys=True))
 
-  print("\n\n\nItems:")
-  allItems = dbm.get_item_list()
+  # print("\n\n\nItems:")
+  # allItems = dbm.get_item_list()
   # print(json.dumps(allItems, indent=2, sort_keys=True))
-  print("Full item:")
-  print(json.dumps(dbm.get_item(allItems[0]["name"]), indent=2, sort_keys=True))
+  # for item in allItems:
+  #   print("Full item:")
+  #   print(json.dumps(dbm.get_item(item["name"]), indent=2, sort_keys=True))
 
   # print("\n\n\nAttacks:")
   # allAttacks = dbm.get_attack_list()
   # print(json.dumps(allAttacks, indent=2, sort_keys=True))
-  # print("Full attack:")
-  # print(json.dumps(dbm.get_attack(allAttacks[0]["id"]), indent=2, sort_keys=True))
+  # for attack in allAttacks:
+  #   print("Full attack:")
+  #   print(json.dumps(dbm.get_attack(attack["id"]), indent=2, sort_keys=True))
 
   dbm._book.close()
