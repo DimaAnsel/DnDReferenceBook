@@ -47,5 +47,5 @@ Temporary Items
 .apdisk
 
 # Specific to this project
-*.sql
+test.sql
 *.db

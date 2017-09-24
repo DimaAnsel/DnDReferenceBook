@@ -140,6 +140,11 @@ class DatabaseManager:
     s = f.read()
     f.close()
     cursor.executescript(s)
+
+    f = open("test.sql")
+    s = f.read()
+    f.close()
+    cursor.executescript(s)
     self.commit()
 
   def commit(self):

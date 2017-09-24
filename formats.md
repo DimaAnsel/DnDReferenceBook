@@ -181,7 +181,7 @@ If `isSpell` is true, also has:
           "item":   <item:simple_item>,
           "qty":    !<quantity:int>,
           "stockDays": !<stock_days:string>,
-          "price":  !<price:int>
+          "price":  !<price:string>
         },
         ...
       ]
