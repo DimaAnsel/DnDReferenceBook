@@ -17,7 +17,7 @@ All returns from the `DatabaseManager` object found in _dbase\_manager.py_ are f
     {
       "name":   <name:string>,
       "img":    !<img_link:string>,
-      "desc":   !<description:string>,
+      "description": !<description:string>,
       "notes":  !<notes:string>,
       "rarity": !<rarity:int>,
       "hd":     !<hit_dice:int>,
@@ -72,7 +72,7 @@ All returns from the `DatabaseManager` object found in _dbase\_manager.py_ are f
       "img":    !<img_link:string>,
       "type":   <type:int>,
       "value":  !<value:string>,
-      "desc":   !<description:string>,
+      "description": !<description:string>,
       "notes":  !<notes:string>,
       "rarity": !<rarity:int>,
     }
@@ -115,7 +115,7 @@ If `type` is consumable, also has:
       "id":       <attack_id:int>,
       "name":     <name:string>,
       "img":      !<img_link:string>,
-      "desc":     !<description:string>,
+      "description": !<description:string>,
       "notes":    !<notes:string>,
       "dmg":      !<damage:string>,
       "isSpell":  <is_spell:bool>
@@ -143,10 +143,13 @@ If `isSpell` is true, also has:
     {
       "name":   <name:string>,
       "img":    !<img_link:string>,
-      "desc":   !<description:string>,
+      "description": !<description:string>,
       "notes":  !<notes:string>,
       "creatures": [
-        <creature:simple_creature>,
+        {
+          <creature:simple_creature>,
+          "notes": !<notes:string>
+        },
         ...
       ],
       "stores": [
@@ -160,8 +163,9 @@ If `isSpell` is true, also has:
 ### Simple
 
     {
-      "name": <name:string>,
-      "img":  !<img_link:string>
+      "name":     <name:string>,
+      "location": <location:string>,
+      "img":      !<img_link:string>
     }
 
 ### Full
@@ -170,13 +174,13 @@ If `isSpell` is true, also has:
       "name":     <name:string>,
       "img":      !<img_link:string>,
       "location": <location:simple_location>,
-      "desc":     !<description:string>,
+      "description": !<description:string>,
       "notes":    !<notes:string>,
       "sells": [
         {
           "item":   <item:simple_item>,
           "qty":    !<quantity:int>,
-          "days":   !<stock_days:string>,
+          "stockDays": !<stock_days:string>,
           "price":  !<price:int>
         },
         ...
