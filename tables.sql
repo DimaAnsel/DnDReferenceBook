@@ -52,7 +52,7 @@ CREATE TABLE Items (
  * Child of Items containing extra fields for a consumable item.
  */
 CREATE TABLE Consumables (
-  name CHAR(255) PRIMARY KEY REFERENCES Items ON DELETE CASCADE,
+  name CHAR(255) PRIMARY KEY REFERENCES Items ON DELETE CASCADE ON UPDATE CASCADE,
   effect CHAR(1023)
 );
 
@@ -60,7 +60,7 @@ CREATE TABLE Consumables (
  * Child of Items containing extra fields for an armor item.
  */
 CREATE TABLE Armor (
-  name CHAR(255) PRIMARY KEY REFERENCES Items ON DELETE CASCADE,
+  name CHAR(255) PRIMARY KEY REFERENCES Items ON DELETE CASCADE ON UPDATE CASCADE,
   ac INTEGER,
   slot CHAR(63)
 );
@@ -70,13 +70,13 @@ CREATE TABLE Armor (
  * relation.
  */
 CREATE TABLE Weapons (
-  name CHAR(255) PRIMARY KEY REFERENCES Items ON DELETE CASCADE,
+  name CHAR(255) PRIMARY KEY REFERENCES Items ON DELETE CASCADE ON UPDATE CASCADE,
   dmg CHAR(127),
   crit CHAR(127),
-  ammo CHAR(255),
+  ammo CHAR(255) REFERENCES Items(name),
   range INTEGER,
   slot CHAR(63),
-  FOREIGN KEY (ammo) REFERENCES Items(name)
+  FOREIGN KEY (ammo) REFERENCES Items(name) ON UPDATE CASCADE
 );
 
 /*
@@ -117,11 +117,11 @@ CREATE TABLE Locations (
  */
 CREATE TABLE Stores (
   name CHAR(255) NOT NULL,
-  location CHAR(255) REFERENCES Locations,
+  location CHAR(255) REFERENCES Locations(name),
   img CHAR(255),
   description TEXT(1023),
   notes TEXT(1023),
-  FOREIGN KEY (location) REFERENCES Locations ON UPDATE CASCADE,
+  FOREIGN KEY (location) REFERENCES Locations(name) ON UPDATE CASCADE,
   PRIMARY KEY (name, location)
 );
 
@@ -138,83 +138,85 @@ CREATE TABLE Stores (
  * Equip relation: Creatures -> Items
  */
 CREATE TABLE Equips (
-  creatureName CHAR(255) NOT NULL,
-  itemName CHAR(255) NOT NULL,
+  creature CHAR(255) NOT NULL,
+  item CHAR(255) NOT NULL,
   equipChance CHAR(127),
   notes TEXT(1023),
-  FOREIGN KEY (itemName) REFERENCES Items(name) ON UPDATE CASCADE,
-  FOREIGN KEY (creatureName) REFERENCES Creatures(name) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (itemName, creatureName)
+  FOREIGN KEY (item) REFERENCES Items(name) ON UPDATE CASCADE,
+  FOREIGN KEY (creature) REFERENCES Creatures(name) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (item, creature)
 );
 
 /*
  * Drop relation: Creatures -> Items
  */
 CREATE TABLE Drops (
-  itemName CHAR(255) NOT NULL,
-  creatureName CHAR(255) NOT NULL,
+  item CHAR(255) NOT NULL,
+  creature CHAR(255) NOT NULL,
   dropChance CHAR(127),
   notes TEXT(1023),
-  FOREIGN KEY (itemName) REFERENCES Items(name) ON UPDATE CASCADE,
-  FOREIGN KEY (creatureName) REFERENCES Creatures(name) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (itemName, creatureName)
+  FOREIGN KEY (item) REFERENCES Items(name) ON UPDATE CASCADE,
+  FOREIGN KEY (creature) REFERENCES Creatures(name) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (item, creature)
 );
 
 /*
  * CreatureAttack relation: Creatures -> SpecialAttacks
  */
 CREATE TABLE CreatureAttacks (
-  creatureName CHAR(255) NOT NULL,
+  creature CHAR(255) NOT NULL,
   attackId INTEGER NOT NULL,
-  FOREIGN KEY (creatureName) REFERENCES Creatures(name) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (creature) REFERENCES Creatures(name) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (attackId) REFERENCES SpecialAttacks(id) ON UPDATE CASCADE,
-  PRIMARY KEY (creatureName, attackId)
+  PRIMARY KEY (creature, attackId)
 );
 
 /*
  * Inhabit relation: Creatures <-> Locations
  */
 CREATE TABLE Inhabits (
-  creatureName CHAR(255) NOT NULL,
-  locationName CHAR(255) NOT NULL,
-  FOREIGN KEY (creatureName) REFERENCES Creatures(name) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (locationName) REFERENCES Locations(name) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (creatureName, locationName)
+  creature CHAR(255) NOT NULL,
+  location CHAR(255) NOT NULL,
+  notes TEXT(1023),
+  FOREIGN KEY (creature) REFERENCES Creatures(name) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (location) REFERENCES Locations(name) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (creature, location)
 );
 
 /*
  * WeaponAttack relation: Weapons -> SpecialAttacks
  */
 CREATE TABLE WeaponAttacks (
-  itemName CHAR(255) NOT NULL,
+  item CHAR(255) NOT NULL,
   attackId INTEGER NOT NULL,
-  FOREIGN KEY (itemName) REFERENCES Items(name) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (item) REFERENCES Items(name) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (attackId) REFERENCES SpecialAttacks(id) ON UPDATE CASCADE,
-  PRIMARY KEY (itemName, attackId)
+  PRIMARY KEY (item, attackId)
 );
 
 /*
  * CastingCost relation: Spells -> Items
  */
 CREATE TABLE CastingCosts (
-  itemName CHAR(255) NOT NULL,
+  item CHAR(255) NOT NULL,
   spellId INTEGER NOT NULL,
-  FOREIGN KEY (itemName) REFERENCES Items(name) ON UPDATE CASCADE,
+  qty INTEGER,
+  FOREIGN KEY (item) REFERENCES Items(name) ON UPDATE CASCADE,
   FOREIGN KEY (spellId) REFERENCES SpecialAttacks(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (itemName, spellId)
+  PRIMARY KEY (item, spellId)
 );
 
 /*
  * Sell relation: Stores -> Items
  */
 CREATE TABLE Sells (
-  itemName CHAR(255) NOT NULL,
-  storeName CHAR(255) NOT NULL,
-  locationName CHAR(255) NOT NULL,
+  item CHAR(255) NOT NULL,
+  store CHAR(255) NOT NULL,
+  location CHAR(255) NOT NULL,
   qty INTEGER,
   stockDays CHAR(127),
   price CHAR(127),
-  FOREIGN KEY (itemName) REFERENCES Items(name) ON UPDATE CASCADE,
-  FOREIGN KEY (storeName, locationName) REFERENCES Stores(name, location) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (itemName, storeName, locationName)
+  FOREIGN KEY (item) REFERENCES Items(name) ON UPDATE CASCADE,
+  FOREIGN KEY (store, location) REFERENCES Stores(name, location) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (item, store, location)
 );

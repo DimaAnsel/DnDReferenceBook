@@ -41,7 +41,7 @@ All returns from the `DatabaseManager` object found in _dbase\_manager.py_ are f
         },
         ...
       ],
-      "creatureAttacks": [
+      "attacks": [
         <attack:simple_attack>,
         ...
       ],
@@ -75,6 +75,42 @@ All returns from the `DatabaseManager` object found in _dbase\_manager.py_ are f
       "description": !<description:string>,
       "notes":  !<notes:string>,
       "rarity": !<rarity:int>,
+      "equippedBy": [
+        {
+          "creature": <creature:simple_creature>,
+          "equipChance": !<equip_chance:string>,
+          "notes":    !<notes:string>
+        },
+        ...
+      ],
+      "droppedBy": [
+        {
+          "creature": <creature:simple_creature>,
+          "dropChance": !<drop_chance:string>,
+          "notes":    !<notes:string>
+        },
+        ...
+      ],
+      "ammoFor": [
+        <weapon:simple_item>,
+        ...
+      ],
+      "spellCost": [
+        {
+          "spell":  <spell:simple_attack>,
+          "qty":    !<quantity:int>
+        },
+        ...
+      ]
+      "soldAt": [
+        {
+          "store":  <store:simple_store>,
+          "qty":    !<quantity:int>,
+          "stockDays": !<stock_days:string>,
+          "price":  !<price:string>
+        },
+        ...
+      ]
     }
 
 If `type` is armor, also has:
@@ -118,14 +154,25 @@ If `type` is consumable, also has:
       "description": !<description:string>,
       "notes":    !<notes:string>,
       "dmg":      !<damage:string>,
-      "isSpell":  <is_spell:bool>
+      "isSpell":  <is_spell:bool>,
+      "creatures": [
+        <creature:simple_creature>,
+        ...
+      ],
+      "weapons": [
+        <weapon:simple_item>,
+        ...
+      ]
     }
 
 If `isSpell` is true, also has:
 
     "channel": !<channel_duration:int>,
     "cost": {
-      <casting_cost:simple_item>,
+      {
+        "item": <item:simple_item>,
+        "qty":  !<quantity:int>
+      },
       ...
     }
 
