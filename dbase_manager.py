@@ -17,6 +17,13 @@ class DatabaseManager:
   SELECT_FILT_ROWS_ALL_COLS = "SELECT * FROM {} WHERE {} == {}"
   # Selects specific columns from specific rows from a given table.
   SELECT_FILT_ROWS_COLS = "SELECT {} FROM {} WHERE {} == {}"
+  # Selects specific columns from specific rows from a given table. More generic
+  # than SELECT_FILT_ROWS_COLS
+  SELECT_FILT_ROWS_COLS_SPECIAL = "SELECT {} FROM {} WHERE {}"
+  # Equals filter.
+  FILT_EQUALS = "{} == {}"
+  # And filter used in join commands.
+  FILT_AND = " AND "
 
   # Format string for text surrounded by quotes (").
   QUOTED = "\"{}\""
@@ -135,6 +142,7 @@ class DatabaseManager:
 
   # Fields present in the simple store object.
   SIMPLE_STORE_FIELDS = ("name",
+                         "location",
                          "img")
   # Fields present in the full store object.
   FULL_STORE_FIELDS = ("name",
@@ -657,13 +665,14 @@ class DatabaseManager:
   #
   # @return Simple representation of store.
   def get_simple_store(self, name, location):
-    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS_SPECIAL.format(
       ",".join(DatabaseManager.SIMPLE_STORE_FIELDS),
       "Stores",
-      "(name,location)",
-      "({},{})".format(
-        DatabaseManager.QUOTED.format(name),
-        DatabaseManager.QUOTED.format(location))))
+      DatabaseManager.FILT_AND.join([
+        DatabaseManager.FILT_EQUALS.format(
+          "name", DatabaseManager.QUOTED.format(name)),
+        DatabaseManager.FILT_EQUALS.format(
+          "location", DatabaseManager.QUOTED.format(location))])))
     if len(rawData) < 1: # no results
       raise IndexError("'{}' does not match any entries in '{}'.".format(name, self._dbase))
 
@@ -681,13 +690,14 @@ class DatabaseManager:
   #
   # @return Full representation of store.
   def get_store(self, name, location):
-    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS_SPECIAL.format(
       ",".join(DatabaseManager.FULL_STORE_FIELDS),
       "Stores",
-      "(name,location)",
-      "({},{})".format(
-        DatabaseManager.QUOTED.format(name),
-        DatabaseManager.QUOTED.format(location))))
+      DatabaseManager.FILT_AND.join([
+        DatabaseManager.FILT_EQUALS.format(
+          "name", DatabaseManager.QUOTED.format(name)),
+        DatabaseManager.FILT_EQUALS.format(
+          "location", DatabaseManager.QUOTED.format(location))])))
     if len(rawData) < 1: # no results
       raise IndexError("'{}' does not match any entries in '{}'.".format(name, self._dbase))
     
