@@ -165,8 +165,8 @@ class DatabaseManager:
     self._book = sqlite3.connect(dbase)
 
   ########
-  # Wipes the saved database and starts from fresh run of `tables.sql` and
-  # `test.sql`.
+  # Wipes the saved database and starts from fresh run of tables and
+  # initial SQL files.
   # 
   # @warning This will delete all saved data. Make a backup if necessary beforehand.
   def reset(self, tables = "tables.sql", initial = None):
@@ -743,7 +743,7 @@ if __name__ == "__main__":
   import json
 
   dbm = DatabaseManager()
-  dbm.reset(initial = "test.sql")
+  dbm.reset(initial = "real.sql")
   allCreatures = dbm.get_creature_list()
 
   # print("Creatures:")
