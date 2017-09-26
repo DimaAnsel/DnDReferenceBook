@@ -101,7 +101,7 @@ All returns from the `DatabaseManager` object found in _dbase\_manager.py_ are f
           "qty":    !<quantity:int>
         },
         ...
-      ]
+      ],
       "soldAt": [
         {
           "store":  <store:simple_store>,

@@ -65,6 +65,7 @@ INSERT INTO Stores(name, location, img, description, notes)
 INSERT INTO Equips(creature, item, equipChance, notes)
   VALUES ("creature 2", "item 3", "[10+] on [1d20]", "equipment 1 notes"),
          ("creature 1", "item 3", "[2+] on [1d8]", "equipment 2 notes"),
+         ("creature 2", "item 1", "[3+] on [1d4]", "equipment 3 notes"),
          ("creature 2", "item 4", NULL, NULL);
 
 INSERT INTO Drops(item, creature, dropChance, notes)
@@ -86,17 +87,17 @@ INSERT INTO Inhabits(creature, location, notes)
          ("creature 3", "location 2", "inhabit 3 notes");
 
 INSERT INTO WeaponAttacks(item, attackId)
-  VALUES ("item 3", 0),
-         ("item 3", 3);
+  VALUES ("item 3", 0);
 
 INSERT INTO CastingCosts(item, spellId, qty)
-  VALUES ("item 1", 3, 1),
-         ("item 2", 6, NULL);
+  VALUES ("item 1", 1, 1),
+         ("item 2", 2, 2),
+         ("item 1", 2, NULL);
 
 INSERT INTO Sells(item, store, location, qty, stockDays, price)
   VALUES ("item 1", "store 1", "location 2", 2, "[4] on [1d4]", "8g2s1c"),
          ("item 2", "store 1", "location 2", NULL, NULL, NULL),
          ("item 1", "store 1", "location 1", 100, "[1] on [1d4]", "2g"),
-         ("item 3", "store 2", "location 3", NULL, NULL, NULL),
+         ("item 3", "store 2", "location 3", 3, "[2] on [1d4]", "3c"),
          ("item 7", "store 2", "location 3", NULL, NULL, NULL),
          ("item 8", "store 2", "location 2", NULL, NULL, NULL);

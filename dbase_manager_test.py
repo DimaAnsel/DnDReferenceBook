@@ -15,7 +15,6 @@ class TestDatabaseManagerMethods(unittest.TestCase):
     self._dbm = DatabaseManager("test/test.db")
 
   def tearDown(self):
-    # do not commit, just close
     self._dbm.close()
 
   ########
@@ -208,6 +207,150 @@ class TestDatabaseManagerMethods(unittest.TestCase):
     self.assertEqual(res["drops"][0]["notes"], None)  
     self.assertEqual(0, len(res["attacks"]))
     self.assertEqual(0, len(res["inhabits"]))
+
+  ########
+  # Verifies functionality of get_item with non-null values.
+  def test_full_item_non_null(self):
+    res = self._dbm.get_item("item 1")
+    self.assertEqual(len(DatabaseManager.FULL_ITEM_FIELDS) + 5, len(res.keys()))
+    self.assertEqual(res["name"], "item 1")
+    self.assertEqual(res["img"], "item 1.tiff")
+    self.assertEqual(res["type"], 0)
+    self.assertEqual(res["value"], "10g,4s")
+    self.assertEqual(res["description"], "item 1 description")
+    self.assertEqual(res["notes"], "item 1 notes")
+    self.assertEqual(res["rarity"], 4)
+
+    self.assertEqual(1, len(res["equippedBy"]))
+    self.assertEqual(3, len(res["equippedBy"][0].keys()))
+    self.assertEqual(res["equippedBy"][0]["creature"]["name"], "creature 2")
+    self.assertEqual(res["equippedBy"][0]["equipChance"], "[3+] on [1d4]")
+    self.assertEqual(res["equippedBy"][0]["notes"], "equipment 3 notes")
+
+    self.assertEqual(1, len(res["droppedBy"]))
+    self.assertEqual(3, len(res["droppedBy"][0].keys()))
+    self.assertEqual(res["droppedBy"][0]["creature"]["name"], "creature 3")
+    self.assertEqual(res["droppedBy"][0]["dropChance"], "[19+] on [1d20]")
+    self.assertEqual(res["droppedBy"][0]["notes"], "drop 1 notes")
+
+    self.assertEqual(1, len(res["ammoFor"]))
+    self.assertEqual(4, len(res["ammoFor"][0]))
+    self.assertEqual(res["ammoFor"][0]["name"], "item 3")
+
+    self.assertEqual(2, len(res["spellCost"]))
+    self.assertEqual(2, len(res["spellCost"][0].keys()))
+    self.assertEqual(2, len(res["soldAt"]))
+    self.assertEqual(4, len(res["soldAt"][0].keys()))
+
+    res = self._dbm.get_item("item 2")
+    self.assertEqual(len(DatabaseManager.FULL_ITEM_FIELDS) + 6, len(res.keys()))
+    self.assertEqual(res["effect"], "item 2 effect")
+    self.assertEqual(1, len(res["spellCost"]))
+    self.assertEqual(2, len(res["spellCost"][0]))
+    self.assertEqual(res["spellCost"][0]["spell"]["id"], 2)
+    self.assertEqual(res["spellCost"][0]["qty"], 2)
+
+    res = self._dbm.get_item("item 3")
+    self.assertEqual(len(DatabaseManager.FULL_ITEM_FIELDS) + len(DatabaseManager.WEAPON_FIELDS) + 6, len(res.keys()))
+    self.assertEqual(res["dmg"], "[1d12]")
+    self.assertEqual(res["crit"], "x3")
+    self.assertEqual(res["ammo"]["name"], "item 1")
+    self.assertEqual(res["range"], 30)
+    self.assertEqual(res["slot"], "one-handed")
+    self.assertEqual(1, len(res["attacks"]))
+    self.assertEqual(res["attacks"][0]["id"], 0)
+
+    self.assertEqual(1, len(res["soldAt"]))
+    self.assertEqual(4, len(res["soldAt"][0].keys()))
+    self.assertEqual(res["soldAt"][0]["store"]["name"], "store 2")
+    self.assertEqual(res["soldAt"][0]["store"]["location"], "location 3")
+    self.assertEqual(res["soldAt"][0]["qty"], 3)
+    self.assertEqual(res["soldAt"][0]["stockDays"], "[2] on [1d4]")
+    self.assertEqual(res["soldAt"][0]["price"], "3c")
+
+    res = self._dbm.get_item("item 4")
+    self.assertEqual(len(DatabaseManager.FULL_ITEM_FIELDS) + len(DatabaseManager.ARMOR_FIELDS) + 5, len(res.keys()))
+    self.assertEqual(res["ac"], 3)
+    self.assertEqual(res["slot"], "helmet")
+
+  ########
+  # Verifies functionality of get_item with null values.
+  def test_full_item_null(self):
+    res = self._dbm.get_item("item 5")
+    self.assertEqual(len(DatabaseManager.FULL_ITEM_FIELDS) + 5, len(res.keys()))
+    self.assertEqual(res["name"], "item 5")
+    self.assertEqual(res["img"], None)
+    self.assertEqual(res["type"], 0)
+    self.assertEqual(res["value"], None)
+    self.assertEqual(res["description"], None)
+    self.assertEqual(res["notes"], None)
+    self.assertEqual(res["rarity"], None)
+    self.assertEqual(0, len(res["equippedBy"]))
+    self.assertEqual(0, len(res["droppedBy"]))
+    self.assertEqual(0, len(res["ammoFor"]))
+    self.assertEqual(0, len(res["spellCost"]))
+    self.assertEqual(0, len(res["soldAt"]))
+
+    res = self._dbm.get_item("item 6")
+    self.assertEqual(len(DatabaseManager.FULL_ITEM_FIELDS) + 6, len(res.keys()))
+    self.assertEqual(res["effect"], None)
+    self.assertEqual(1, len(res["droppedBy"]))
+    self.assertEqual(3, len(res["droppedBy"][0].keys()))
+    self.assertEqual(res["droppedBy"][0]["creature"]["name"], "creature 4")
+    self.assertEqual(res["droppedBy"][0]["dropChance"], None)
+    self.assertEqual(res["droppedBy"][0]["notes"], None)
+
+    res = self._dbm.get_item("item 7")
+    self.assertEqual(len(DatabaseManager.FULL_ITEM_FIELDS) + len(DatabaseManager.ARMOR_FIELDS) + 5, len(res.keys()))
+    self.assertEqual(res["ac"], None)
+    self.assertEqual(res["slot"], None)
+
+    self.assertEqual(1, len(res["soldAt"]))
+    self.assertEqual(4, len(res["soldAt"][0].keys()))
+    self.assertEqual(res["soldAt"][0]["store"]["name"], "store 2")
+    self.assertEqual(res["soldAt"][0]["store"]["location"], "location 3")
+    self.assertEqual(res["soldAt"][0]["qty"], None)
+    self.assertEqual(res["soldAt"][0]["stockDays"], None)
+    self.assertEqual(res["soldAt"][0]["price"], None)
+
+    res = self._dbm.get_item("item 8")
+    self.assertEqual(len(DatabaseManager.FULL_ITEM_FIELDS) + len(DatabaseManager.WEAPON_FIELDS) + 6, len(res.keys()))
+    self.assertEqual(res["dmg"], None)
+    self.assertEqual(res["crit"], None)
+    self.assertEqual(res["ammo"], None)
+    self.assertEqual(res["range"], None)
+    self.assertEqual(res["slot"], None)
+    self.assertEqual(0, len(res["attacks"]))
+
+  ########
+  # Verifies functionality of get_attack with non-null values.
+  def test_full_attack_non_null(self):
+    pass
+
+  ########
+  # Verifies functionality of get_attack with null values.
+  def test_full_attack_null(self):
+    pass
+
+  ########
+  # Verifies functionality of get_location with non-null values.
+  def test_full_location_non_null(self):
+    pass
+
+  ########
+  # Verifies functionality of get_location with null values.
+  def test_full_location_null(self):
+    pass
+
+  ########
+  # Verifies functionality of get_store with non=null values.
+  def test_full_store_non_null(self):
+    pass
+
+  ########
+  # Verifies functionality of get_store with null values.
+  def test_full_store_null(self):
+    pass
 
 if __name__ == "__main__":
   print("Setup")
