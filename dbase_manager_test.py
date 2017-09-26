@@ -325,32 +325,138 @@ class TestDatabaseManagerMethods(unittest.TestCase):
   ########
   # Verifies functionality of get_attack with non-null values.
   def test_full_attack_non_null(self):
-    pass
+    res = self._dbm.get_attack(0)
+    self.assertEqual(len(DatabaseManager.FULL_ATTACK_FIELDS) + 2, len(res.keys()))
+    self.assertEqual(res["id"], 0)
+    self.assertEqual(res["name"], "attack 1")
+    self.assertEqual(res["img"], "attack 1_a.gif")
+    self.assertEqual(res["description"], "attack 1 description")
+    self.assertEqual(res["notes"], "attack 1 notes")
+    self.assertEqual(res["dmg"], "[1d2] + 4")
+    self.assertEqual(res["isSpell"], 0)
+
+    self.assertEqual(1, len(res["creatures"]))
+    self.assertEqual(res["creatures"][0]["name"], "creature 2")
+
+    self.assertEqual(1, len(res["weapons"]))
+    self.assertEqual(res["weapons"][0]["name"], "item 3")
+
+    res = self._dbm.get_attack(1)
+    self.assertEqual(len(DatabaseManager.FULL_ATTACK_FIELDS) + len(DatabaseManager.SPELL_FIELDS) + 3, len(res.keys()))
+    self.assertEqual(res["id"], 1)
+    self.assertEqual(res["name"], "attack 1")
+    self.assertEqual(res["img"], "attack 1_b.png")
+    self.assertEqual(res["isSpell"], 1)
+    self.assertEqual(res["channel"], 4)
+    self.assertEqual(1, len(res["costs"]))
+    self.assertEqual(2, len(res["costs"][0].keys()))
+    self.assertEqual(res["costs"][0]["item"]["name"], "item 1")
+    self.assertEqual(res["costs"][0]["qty"], 1)
 
   ########
   # Verifies functionality of get_attack with null values.
   def test_full_attack_null(self):
-    pass
+    res = self._dbm.get_attack(4)
+    self.assertEqual(len(DatabaseManager.FULL_ATTACK_FIELDS) + 2, len(res.keys()))
+    self.assertEqual(res["id"], 4)
+    self.assertEqual(res["name"], "attack 4")
+    self.assertEqual(res["img"], None)
+    self.assertEqual(res["description"], None)
+    self.assertEqual(res["notes"], None)
+    self.assertEqual(res["dmg"], None)
+    self.assertEqual(res["isSpell"], 0)
+
+    self.assertEqual(1, len(res["creatures"]))
+    self.assertEqual(res["creatures"][0]["name"], "creature 1")
+
+    self.assertEqual(0, len(res["weapons"]))
+
+    res = self._dbm.get_attack(3)
+    self.assertEqual(len(DatabaseManager.FULL_ATTACK_FIELDS) + len(DatabaseManager.SPELL_FIELDS) + 3, len(res.keys()))
+    self.assertEqual(res["isSpell"], 1)
+    self.assertEqual(res["channel"], None)
+    self.assertEqual(1, len(res["costs"]))
+    self.assertEqual(2, len(res["costs"][0].keys()))
+    self.assertEqual(res["costs"][0]["item"]["name"], "item 4")
+    self.assertEqual(res["costs"][0]["qty"], None)
 
   ########
   # Verifies functionality of get_location with non-null values.
   def test_full_location_non_null(self):
-    pass
+    res = self._dbm.get_location("location 1")
+    self.assertEqual(len(DatabaseManager.FULL_LOCATION_FIELDS) + 2, len(res.keys()))
+    self.assertEqual(res["name"], "location 1")
+    self.assertEqual(res["img"], "location 1.png")
+    self.assertEqual(res["description"], "location 1 description")
+    self.assertEqual(res["notes"], "location 1 notes")
+
+    self.assertEqual(1, len(res["creatures"]))
+    self.assertEqual(2, len(res["creatures"][0].keys()))
+    self.assertEqual(res["creatures"][0]["creature"]["name"], "creature 1")
+    self.assertEqual(res["creatures"][0]["notes"], "inhabit 1 notes")
+
+    self.assertEqual(1, len(res["stores"]))
+    self.assertEqual(res["stores"][0]["name"], "store 1")
+    self.assertEqual(res["stores"][0]["location"], "location 1")
 
   ########
   # Verifies functionality of get_location with null values.
   def test_full_location_null(self):
-    pass
+    res = self._dbm.get_location("location 3")
+    self.assertEqual(len(DatabaseManager.FULL_LOCATION_FIELDS) + 2, len(res.keys()))
+    self.assertEqual(res["name"], "location 3")
+    self.assertEqual(res["img"], None)
+    self.assertEqual(res["description"], None)
+    self.assertEqual(res["notes"], None)
+    self.assertEqual(1, len(res["creatures"]))
+    self.assertEqual(res["creatures"][0]["creature"]["name"], "creature 2")
+
+    self.assertEqual(1, len(res["stores"]))
+    self.assertEqual(res["stores"][0]["name"], "store 2")
+    self.assertEqual(res["stores"][0]["img"], None)
+
+    res = self._dbm.get_location("location 2")
+    self.assertEqual(1, len(res["creatures"]))
+    self.assertEqual(res["creatures"][0]["creature"]["name"], "creature 1")
+    self.assertEqual(res["creatures"][0]["notes"], None)
 
   ########
   # Verifies functionality of get_store with non=null values.
   def test_full_store_non_null(self):
-    pass
+    res = self._dbm.get_store("store 1", "location 2")
+    self.assertEqual(len(DatabaseManager.FULL_STORE_FIELDS) + 1, len(res.keys()))
+    self.assertEqual(res["name"], "store 1")
+    self.assertEqual(res["location"]["name"], "location 2")
+    self.assertEqual(res["img"], "store 1.gif")
+    self.assertEqual(res["description"], "store 1 description")
+    self.assertEqual(res["notes"], "store 1 notes")
+
+    self.assertEqual(2, len(res["sells"]))
+
+    res = self._dbm.get_store("store 1", "location 1")
+    self.assertEqual(1, len(res["sells"]))
+    self.assertEqual(4, len(res["sells"][0].keys()))
+    self.assertEqual(res["sells"][0]["item"]["name"], "item 1")
+    self.assertEqual(res["sells"][0]["qty"], 100)
+    self.assertEqual(res["sells"][0]["stockDays"], "[1] on [1d4]")
+    self.assertEqual(res["sells"][0]["price"], "2g")
 
   ########
   # Verifies functionality of get_store with null values.
   def test_full_store_null(self):
-    pass
+    res = self._dbm.get_store("store 2", "location 2")
+    self.assertEqual(len(DatabaseManager.FULL_STORE_FIELDS) + 1, len(res.keys()))
+    self.assertEqual(res["name"], "store 2")
+    self.assertEqual(res["location"]["name"], "location 2")
+    self.assertEqual(res["img"], None)
+    self.assertEqual(res["description"], None)
+    self.assertEqual(res["notes"], None)
+
+    self.assertEqual(1, len(res["sells"]))
+    self.assertEqual(res["sells"][0]["item"]["name"], "item 8")
+    self.assertEqual(res["sells"][0]["qty"], None)
+    self.assertEqual(res["sells"][0]["stockDays"], None)
+    self.assertEqual(res["sells"][0]["price"], None)
 
 if __name__ == "__main__":
   print("Setup")

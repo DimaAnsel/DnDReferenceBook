@@ -43,7 +43,7 @@ INSERT INTO SpecialAttacks(id, name, img, description, notes, dmg, isSpell)
 INSERT INTO Spells(id, channel)
   VALUES (1, 4),
          (2, NULL),
-         (3, 0);
+         (3, NULL);
 
 INSERT INTO Locations(name, img, description, notes)
   VALUES ("location 1", "location 1.png", "location 1 description", "location 1 notes"),
@@ -83,8 +83,7 @@ INSERT INTO CreatureAttacks(creature, attackId)
 INSERT INTO Inhabits(creature, location, notes)
   VALUES ("creature 1", "location 1", "inhabit 1 notes"),
          ("creature 1", "location 2", NULL),
-         ("creature 2", "location 3", "inhabit 2 notes"),
-         ("creature 3", "location 2", "inhabit 3 notes");
+         ("creature 2", "location 3", "inhabit 2 notes");
 
 INSERT INTO WeaponAttacks(item, attackId)
   VALUES ("item 3", 0);
@@ -92,7 +91,8 @@ INSERT INTO WeaponAttacks(item, attackId)
 INSERT INTO CastingCosts(item, spellId, qty)
   VALUES ("item 1", 1, 1),
          ("item 2", 2, 2),
-         ("item 1", 2, NULL);
+         ("item 1", 2, NULL),
+         ("item 4", 3, NULL);
 
 INSERT INTO Sells(item, store, location, qty, stockDays, price)
   VALUES ("item 1", "store 1", "location 2", 2, "[4] on [1d4]", "8g2s1c"),

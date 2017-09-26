@@ -132,7 +132,6 @@ class DatabaseManager:
   # Fields present in the full location object.
   FULL_LOCATION_FIELDS = ("name",
                           "img",
-                          "location",
                           "description",
                           "notes")
   # Fields present in the creatures field of the full location object.
@@ -626,7 +625,7 @@ class DatabaseManager:
       "location",
       DatabaseManager.QUOTED.format(name)))
     for item in rawData:
-      temp = {"creatures": self.get_simple_creature(item[0])}
+      temp = {"creature": self.get_simple_creature(item[0])}
       for i in range(1, len(DatabaseManager.LOCATION_INHABITS_FIELDS)):
         temp[DatabaseManager.LOCATION_INHABITS_FIELDS[i]] = item[i]
       toRet["creatures"].append(temp)
@@ -709,13 +708,14 @@ class DatabaseManager:
 
     # Sells
     toRet["sells"] = []
-    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS.format(
+    rawData = self._fetch_raw(DatabaseManager.SELECT_FILT_ROWS_COLS_SPECIAL.format(
       ",".join(DatabaseManager.STORE_SELLS_FIELDS),
       "Sells",
-      "(store,location)",
-      "({},{})".format(
-        DatabaseManager.QUOTED.format(name),
-        DatabaseManager.QUOTED.format(location))))
+      DatabaseManager.FILT_AND.join([
+        DatabaseManager.FILT_EQUALS.format(
+          "store", DatabaseManager.QUOTED.format(name)),
+        DatabaseManager.FILT_EQUALS.format(
+          "location", DatabaseManager.QUOTED.format(location))])))
     for item in rawData:
       temp = {"item": self.get_simple_item(item[0])}
       for i in range(1, len(DatabaseManager.STORE_SELLS_FIELDS)):
