@@ -7,12 +7,12 @@
 ################################
 
 import unittest
-from dbase_manager import DatabaseManager
+from DnDReferenceBook.src.dbase_manager import DatabaseManager
 
 class TestDatabaseManagerMethods(unittest.TestCase):
   
   def setUp(self):
-    self._dbm = DatabaseManager("test/test.db")
+    self._dbm = DatabaseManager("test.db")
 
   def tearDown(self):
     self._dbm.close()
@@ -460,8 +460,8 @@ class TestDatabaseManagerMethods(unittest.TestCase):
 
 if __name__ == "__main__":
   print("Setup")
-  temp_dbm = DatabaseManager("test/test.db")
-  temp_dbm.reset("tables.sql", "test/test.sql")
+  temp_dbm = DatabaseManager("test.db")
+  temp_dbm.reset("../src/tables.sql", "test.sql")
   temp_dbm.commit()
   temp_dbm.close()
   del temp_dbm
