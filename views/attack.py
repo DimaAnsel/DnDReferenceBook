@@ -95,4 +95,3 @@ if __name__ == "__main__":
   sav4.grid(row = 3, column = 0, sticky = W+E)
 
   root.mainloop()
-
