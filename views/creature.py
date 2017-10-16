@@ -9,6 +9,8 @@
 from tkinter import *
 import utility
 
+################
+# Tkinter representation of full creature object, used as separate page.
 class CreatureView(Frame):
 
   XP_FMT = "XP: {}"
@@ -119,6 +121,8 @@ class CreatureView(Frame):
     utility.update_img(self._imgLabel, CreatureView.DEFAULT_IMG)
     utility.update_text(self._descText, CreatureView.DEFAULT)
     utility.update_text(self._notesText, CreatureView.DEFAULT)
+# CreatureView
+################
 
 ################
 # Tkinter representation of simple creature object, used for previews.
@@ -160,6 +164,8 @@ class SimpleCreatureView(Frame):
   def set_defaults(self):
     utility.update_img(self._imgLabel, CreatureView.DEFAULT_IMG, maxSize = 30)
     self._nameLabel.config(text = SimpleCreatureView.NAME_FORMAT.format("Name", CreatureView.DEFAULT))
+# SimpleCreatureView
+################
 
 ########
 # Test code
