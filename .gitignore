@@ -50,3 +50,6 @@ Temporary Items
 real.sql
 *.db
 __pycache__/
+data/
+*.png
+*.xcf

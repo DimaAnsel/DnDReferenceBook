@@ -17,6 +17,7 @@ class CreatureView(Frame):
   HP_FMT = "HP: {}"
 
   DEFAULT = "??"
+  DEFAULT_IMG = "default_img.png"
 
   def __init__(self, master, data = None):
     super().__init__(master)
@@ -61,7 +62,7 @@ class CreatureView(Frame):
     self._notesText.config(yscrollcommand = self._notesScroll.set)
 
 
-    self._imgLabel.grid(row = 0, column = 0, sticky = N+W+E+S)
+    self._imgLabel.grid(    row = 0, column = 0,                 sticky = N+W+E+S)
 
     self._nameLabel.grid(   row = 0, column = 0, columnspan = 2, sticky = W)
     self._xpLabel.grid(     row = 0, column = 2,                 sticky = E)
@@ -82,6 +83,10 @@ class CreatureView(Frame):
 
   def populate(self, creature):
     for k, v in creature.items():
+      if k == "img":
+        if v == None:
+          v = CreatureView.DEFAULT_IMG
+        utility.update_img(self._imgLabel, v)
       if k == "name":
         self._nameLabel.config(text = v)
       elif k == "description":
@@ -93,26 +98,78 @@ class CreatureView(Frame):
           v = ""
         utility.update_text(self._notesText, v)
       elif k == "hd":
+        if v == None:
+          v = CreatureView.DEFAULT
         self._hdLabel.config(text = CreatureView.HD_FMT.format(v))
       elif k == "hp":
+        if v == None:
+          v = CreatureView.DEFAULT
         self._hpLabel.config(text = CreatureView.HP_FMT.format(v))
       elif k == "ac":
+        if v == None:
+          v = CreatureView.DEFAULT
         self._acLabel.config(text = CreatureView.AC_FMT.format(v))
       elif k == "xp":
+        if v == None:
+          v = CreatureView.DEFAULT
         self._xpLabel.config(text = CreatureView.XP_FMT.format(v))
       # TODO: handle other cases
 
   def set_defaults(self):
+    utility.update_img(self._imgLabel, CreatureView.DEFAULT_IMG)
     utility.update_text(self._descText, CreatureView.DEFAULT)
     utility.update_text(self._notesText, CreatureView.DEFAULT)
 
+################
+# Tkinter representation of simple creature object, used for previews.
+class SimpleCreatureView(Frame):
 
+  NAME_FORMAT = "{} ({})"
+
+  def __init__(self, master, data = None):
+    super().__init__(master)
+    self._create_widgets()
+    if data != None:
+      self.populate(data)
+    else:
+      self.set_defaults()
+
+  def _create_widgets(self):
+    self._imgLabel = Label(self)
+    self._nameLabel = Label(self, text = SimpleCreatureView.NAME_FORMAT.format("Name", CreatureView.DEFAULT))
+
+    self._imgLabel.grid(  row = 0, column = 0, sticky = N+W+E+S)
+    self._nameLabel.grid( row = 0, column = 1, sticky = W)
+
+  def populate(self, data):
+    name = ""
+    hd = CreatureView.DEFAULT
+    for k, v in data.items():
+      if k == "name":
+        name = v
+      elif k == "img":
+        if v == None:
+          v = CreatureView.DEFAULT_IMG
+        utility.update_img(self._imgLabel, v, maxSize = 30)
+      elif k == "hd":
+        if v != None:
+          hd = v
+    self._nameLabel.config(text = SimpleCreatureView.NAME_FORMAT.format(name, hd))
+
+
+  def set_defaults(self):
+    utility.update_img(self._imgLabel, CreatureView.DEFAULT_IMG, maxSize = 30)
+    self._nameLabel.config(text = SimpleCreatureView.NAME_FORMAT.format("Name", CreatureView.DEFAULT))
+
+########
+# Test code
 if __name__ == "__main__":
   from DnDReferenceBook.src.dbase_manager import DatabaseManager
 
   root = Tk()
 
   dbm = DatabaseManager("../data/dnd_ref_book.db")
+  dbm.reset("../src/tables.sql", "../src/real.sql")
   cv = CreatureView(root)
   cv.grid(row = 0, column = 0, sticky = N+W)
   cv2 = CreatureView(root, dbm.get_creature("Flame Wisp"))
@@ -121,5 +178,15 @@ if __name__ == "__main__":
   cv3.grid(row = 1, column = 0, sticky = N+W)
   cv4 = CreatureView(root, dbm.get_creature("Crystalline Serpent"))
   cv4.grid(row = 1, column = 1, sticky = N+W)
+
+  top = Toplevel(root)
+  scv = SimpleCreatureView(top)
+  scv.grid(row = 0, column = 0, sticky = W+E)
+  scv2 = SimpleCreatureView(top, dbm.get_creature("Flame Wisp"))
+  scv2.grid(row = 1, column = 0, sticky = W+E)
+  scv3 = SimpleCreatureView(top, dbm.get_creature("Apprentice Rock Elementalist"))
+  scv3.grid(row = 2, column = 0, sticky = W+E)
+  scv4 = SimpleCreatureView(top, dbm.get_creature("Crystalline Serpent"))
+  scv4.grid(row = 3, column = 0, sticky = W+E)
 
   root.mainloop()
