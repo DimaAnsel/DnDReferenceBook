@@ -7,32 +7,19 @@
 ################################
 
 from tkinter import *
+from base_view import BaseView
 import utility
 
 ################
 # Tkinter representation of full attack object, used as separate page.
-class AttackView(Frame):
-
-  DEFAULT = "??"
-  DEFAULT_IMG = "default_img.png"
-
-  # Magic Wand by useiconic.com from the Noun Project
-  WAND_IMG = {True: "is_spell.png",
-              False: "not_spell.png"}
+class AttackView(BaseView):
+  pass
 # AttackView
 ################
 
 ################
 # Tkinter representation of simple attack object, used for previews.
-class SimpleAttackView(Frame):
-
-  def __init__(self, master, data = None):
-    super().__init__(master)
-    self._create_widgets()
-    if data != None:
-      self.populate(data)
-    else:
-      self.set_defaults()
+class SimpleAttackView(BaseView):
 
   def _create_widgets(self):
     self._imgLabel = Label(self)
@@ -50,18 +37,18 @@ class SimpleAttackView(Frame):
         name = v
       elif k == "img":
         if v == None:
-          v = AttackView.DEFAULT_IMG
+          v = BaseView.DEFAULT_IMG
         utility.update_img(self._imgLabel, v, maxSize = 30)
       elif k == "isSpell":
         if v == None:
           v = False
-        utility.update_img(self._spellLabel, AttackView.WAND_IMG[v], maxSize = 30)
+        utility.update_img(self._spellLabel, BaseView.WAND_IMG[v], maxSize = 30)
     self._nameLabel.config(text = name)
 
 
   def set_defaults(self):
-    utility.update_img(self._imgLabel, AttackView.DEFAULT_IMG, maxSize = 30)
-    utility.update_img(self._spellLabel, AttackView.WAND_IMG[False], maxSize = 30)
+    utility.update_img(self._imgLabel, BaseView.DEFAULT_IMG, maxSize = 30)
+    utility.update_img(self._spellLabel, BaseView.WAND_IMG[False], maxSize = 30)
     self._nameLabel.config(text = "Name")
 # SimpleAttackView
 ################
