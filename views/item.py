@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
   root = Tk()
 
-  dbm = DatabaseManager("../data/dnd_ref_book.db")
+  dbm = DatabaseManager("../data/dnd_ref_book.db", "../data/img/")
   dbm.reset("../src/tables.sql", "../src/real.sql")
   # cv = CreatureView(root)
   # cv.grid(row = 0, column = 0, sticky = N+W)

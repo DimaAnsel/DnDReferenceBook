@@ -174,7 +174,7 @@ if __name__ == "__main__":
 
   root = Tk()
 
-  dbm = DatabaseManager("../data/dnd_ref_book.db")
+  dbm = DatabaseManager("../data/dnd_ref_book.db", "../data/img/")
   dbm.reset("../src/tables.sql", "../src/real.sql")
   cv = CreatureView(root)
   cv.grid(row = 0, column = 0, sticky = N+W)
@@ -184,6 +184,8 @@ if __name__ == "__main__":
   cv3.grid(row = 1, column = 0, sticky = N+W)
   cv4 = CreatureView(root, dbm.get_creature("Crystalline Serpent"))
   cv4.grid(row = 1, column = 1, sticky = N+W)
+  cv5 = CreatureView(root, dbm.get_creature("Rock Elemental"))
+  cv5.grid(row = 0, column = 2, sticky = N+W)
 
   top = Toplevel(root)
   scv = SimpleCreatureView(top)
@@ -194,5 +196,7 @@ if __name__ == "__main__":
   scv3.grid(row = 2, column = 0, sticky = W+E)
   scv4 = SimpleCreatureView(top, dbm.get_creature("Crystalline Serpent"))
   scv4.grid(row = 3, column = 0, sticky = W+E)
+  scv5 = SimpleCreatureView(top, dbm.get_creature("Rock Elemental"))
+  scv5.grid(row = 4, column = 0, sticky = W+E)
 
   root.mainloop()

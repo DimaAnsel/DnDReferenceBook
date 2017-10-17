@@ -159,9 +159,12 @@ class DatabaseManager:
   # Initializes the manager and opens the connection to the database.
   #
   # @param[in] dbase File name/path this manager will query and modify.
-  def __init__(self, dbase = "dnd_ref_book.db"):
+  # @param[in] filepathPrefix Filepath to prepend to returned filenames (images).
+  #                           Allows initializing from separate directories.
+  def __init__(self, dbase = "dnd_ref_book.db", filepathPrefix = ""):
     self._dbase = dbase
     self._book = sqlite3.connect(dbase)
+    self._filepathPrefix = filepathPrefix
 
   ########
   # Wipes the saved database and starts from fresh run of tables and
@@ -231,6 +234,8 @@ class DatabaseManager:
     toRet = {}
     for i in range(len(DatabaseManager.SIMPLE_CREATURE_FIELDS)):
       toRet[DatabaseManager.SIMPLE_CREATURE_FIELDS[i]] = rawData[0][i]
+    if toRet["img"] != None:
+      toRet["img"] = self._filepathPrefix + toRet["img"]
     return toRet
 
   ########
@@ -302,6 +307,8 @@ class DatabaseManager:
         temp[DatabaseManager.CREATURE_INHABITS_FIELDS[i]] = item[i]
       toRet["inhabits"].append(temp)
 
+    if toRet["img"] != None:
+      toRet["img"] = self._filepathPrefix + toRet["img"]
     return toRet
 
   ########
@@ -336,6 +343,9 @@ class DatabaseManager:
     toRet = {}
     for i in range(len(DatabaseManager.SIMPLE_ITEM_FIELDS)):
       toRet[DatabaseManager.SIMPLE_ITEM_FIELDS[i]] = rawData[0][i]
+
+    if toRet["img"] != None:
+      toRet["img"] = self._filepathPrefix + toRet["img"]
     return toRet
 
   ########
@@ -462,6 +472,8 @@ class DatabaseManager:
         temp[DatabaseManager.ITEM_SELLS_FIELDS[i]] = item[i]
       toRet["soldAt"].append(temp)
 
+    if toRet["img"] != None:
+      toRet["img"] = self._filepathPrefix + toRet["img"]
     return toRet
 
   ########
@@ -496,6 +508,9 @@ class DatabaseManager:
     toRet = {}
     for i in range(len(DatabaseManager.SIMPLE_ATTACK_FIELDS)):
       toRet[DatabaseManager.SIMPLE_ATTACK_FIELDS[i]] = rawData[0][i]
+
+    if toRet["img"] != None:
+      toRet["img"] = self._filepathPrefix + toRet["img"]
     return toRet
 
   ########
@@ -560,7 +575,8 @@ class DatabaseManager:
     for item in rawData:
       toRet["weapons"].append(self.get_simple_item(item[0]))
 
-
+    if toRet["img"] != None:
+      toRet["img"] = self._filepathPrefix + toRet["img"]
     return toRet
 
   ########
@@ -595,6 +611,9 @@ class DatabaseManager:
     toRet = {}
     for i in range(len(DatabaseManager.SIMPLE_LOCATION_FIELDS)):
       toRet[DatabaseManager.SIMPLE_LOCATION_FIELDS[i]] = rawData[0][i]
+
+    if toRet["img"] != None:
+      toRet["img"] = self._filepathPrefix + toRet["img"]
     return toRet
 
   ########
@@ -640,6 +659,8 @@ class DatabaseManager:
     for item in rawData:
       toRet["stores"].append(self.get_simple_store(item[0], name))
 
+    if toRet["img"] != None:
+      toRet["img"] = self._filepathPrefix + toRet["img"]
     return toRet
 
   ########
@@ -678,6 +699,9 @@ class DatabaseManager:
     toRet = {}
     for i in range(len(DatabaseManager.SIMPLE_STORE_FIELDS)):
       toRet[DatabaseManager.SIMPLE_STORE_FIELDS[i]] = rawData[0][i]
+
+    if toRet["img"] != None:
+      toRet["img"] = self._filepathPrefix + toRet["img"]
     return toRet
 
   ########
@@ -722,6 +746,8 @@ class DatabaseManager:
         temp[DatabaseManager.STORE_SELLS_FIELDS[i]] = item[i]
       toRet["sells"].append(temp)
 
+    if toRet["img"] != None:
+      toRet["img"] = self._filepathPrefix + toRet["img"]
     return toRet
 
   ########
