@@ -11,6 +11,7 @@ from tkinter import *
 
 class BaseView(Frame):
 
+  EMPTY_STR = ""
   DEFAULT = "??"
   DEFAULT_IMG = "assets/default_img.png"
 
@@ -38,6 +39,7 @@ class BaseView(Frame):
 
   def __init__(self, master, data = None, omniscient = True):
     super().__init__(master)
+    self._data = data
     self._omniscient = omniscient
     self._create_widgets()
     if data != None:

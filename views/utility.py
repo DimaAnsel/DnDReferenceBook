@@ -33,3 +33,11 @@ def update_img(widget, filepath, maxSize = 300):
   tkImg = ImageTk.PhotoImage(img)
   widget.config(image = tkImg)
   widget.photo = tkImg
+
+def update_combobox(widget, values):
+  widget.config(state = NORMAL)
+  widget.delete(0, END)
+  widget.config(values = values)
+  widget.config(state = "readonly")
+  if len(values) > 0:
+    widget.current(0)

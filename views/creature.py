@@ -26,6 +26,8 @@ class CreatureView(BaseView):
   DROP_CHANCE = "Drop Chance: {}"
   BASIC_ATTACK = "Basic Attack: {}"
 
+  ########
+  # Initializes and places all GUI elements.
   def _create_widgets(self):
     # left frame
     self._leftFrame    = Frame(self)
@@ -61,7 +63,7 @@ class CreatureView(BaseView):
     self._dropVar      = StringVar(self)
     self._dropCombo    = Combobox(self._leftFrame,
                                   state = "readonly",
-                                  textvariable = self._equipVar)
+                                  textvariable = self._dropVar)
     self._dropPreview  = SimpleItemView(self._leftFrame)
     self._dropChance   = Label(self._leftFrame,
                                text = CreatureView.DROP_CHANCE.format(BaseView.DEFAULT),
@@ -135,19 +137,19 @@ class CreatureView(BaseView):
     self._attacksLabel  = Label(self._rightBotFrame,
                                 text = "Special Attacks:",
                                 font = BaseView.NORMAL_FONT)
-    self._attacksVal    = StringVar(self)
+    self._attacksVar    = StringVar(self)
     self._attacksCombo  = Combobox(self._rightBotFrame,
                                    state = "readonly",
-                                   textvariable = self._attacksVal)
+                                   textvariable = self._attacksVar)
     self._attackPreview = SimpleAttackView(self._rightBotFrame)
     self._rightSep5     = Separator(self._rightBotFrame, orient = "horizontal")
     self._inhabitsLabel = Label(self._rightBotFrame,
                                 text = "Inhabits:",
                                 font = BaseView.NORMAL_FONT)
-    self._inhabitsVal   = StringVar(self)
+    self._inhabitsVar   = StringVar(self)
     self._inhabitsCombo = Combobox(self._rightBotFrame,
                                    state = "readonly",
-                                   textvariable = self._inhabitsVal)
+                                   textvariable = self._inhabitsVar)
     self._inhabitsPreview    = SimpleLocationView(self._rightBotFrame)
     self._inhabitsNotesLabel = Label(self._rightBotFrame,
                                      text = "Notes:",
@@ -222,8 +224,21 @@ class CreatureView(BaseView):
     self._leftFrame.grid(    row = 0, column = 0,                 sticky = N+W)
     self._rightFrame.grid(   row = 0, column = 1,                 sticky = N+W)
 
-  def populate(self, creature):
-    for k, v in creature.items():
+
+    # bindings
+    self._equipVar.trace('w', self._preview_equip)
+    self._dropVar.trace('w', self._preview_drop)
+    self._attacksVar.trace('w', self._preview_attack)
+    self._inhabitsVar.trace('w', self._preview_inhabit)
+
+  ########
+  # Populates all GUI elements with new data.
+  def populate(self, data):
+    if data == None: # null check
+      self.set_defaults()
+      return
+    self._data = data
+    for k, v in data.items():
       if k == "img":
         if v == None: # null check
           v = BaseView.DEFAULT_IMG
@@ -264,19 +279,88 @@ class CreatureView(BaseView):
         self._basicAttack.config(text = CreatureView.BASIC_ATTACK.format(v))
       # TODO: handle other cases
       elif k == "equips":
-        pass
+        if v == None: # null check
+          v = []
+        utility.update_combobox(self._equipCombo, [equip["item"]["name"] for equip in v])
       elif k == "drops":
-        pass
+        if v == None: # null check
+          v = []
+        utility.update_combobox(self._dropCombo, [drop["item"]["name"] for drop in v])
       elif k == "attacks":
-        pass
+        if v == None: # null check
+          v = []
+        utility.update_combobox(self._attacksCombo, [attack["name"] for attack in v])
       elif k == "inhabits":
-        pass
+        if v == None: # null check
+          v = []
+        utility.update_combobox(self._inhabitsCombo, [loc["location"]["name"] for loc in v])
 
+  ########
+  # Resets GUI elements to default values.
   def set_defaults(self):
     utility.update_img(self._imgLabel, BaseView.DEFAULT_IMG, maxSize = 300)
     utility.update_img(self._nameLabel, BaseView.RARITY_IMG[None], maxSize = 30)
-    utility.update_text(self._descText, BaseView.DEFAULT)
-    utility.update_text(self._notesText, BaseView.DEFAULT)
+    utility.update_text(self._descText, BaseView.EMPTY_STR)
+    utility.update_text(self._notesText, BaseView.EMPTY_STR)
+    utility.update_combobox(self._equipCombo, [])
+    utility.update_combobox(self._dropCombo, [])
+    utility.update_combobox(self._attacksCombo, [])
+    utility.update_combobox(self._inhabitsCombo, [])
+
+  def _preview_equip(self, *args, **kwargs):
+    # first reset all
+    self._equipPreview.set_defaults()
+    self._equipChance.config(text = CreatureView.EQUIP_CHANCE.format(BaseView.DEFAULT))
+    utility.update_text(self._equipNotes, BaseView.EMPTY_STR)
+    # update with new values
+    if self._data == None or self._equipCombo.current() == -1:
+      return
+    newEquip = self._data["equips"][self._equipCombo.current()]
+    if newEquip != None:
+      self._equipPreview.populate(newEquip["item"])
+      if newEquip["equipChance"] != None:
+        self._equipChance.config(text = CreatureView.EQUIP_CHANCE.format(newEquip["equipChance"]))
+      if newEquip["notes"] != None:
+        utility.update_text(self._equipNotes, newEquip["notes"])
+
+  def _preview_drop(self, *args, **kwargs):
+    # first reset all
+    self._dropPreview.set_defaults()
+    self._dropChance.config(text = CreatureView.DROP_CHANCE.format(BaseView.DEFAULT))
+    utility.update_text(self._dropNotes, BaseView.EMPTY_STR)
+    # update with new values
+    if self._data == None or self._dropCombo.current() == -1:
+      return
+    newDrop = self._data["drops"][self._dropCombo.current()]
+    if newDrop != None:
+      self._dropPreview.populate(newDrop["item"])
+      if newDrop["dropChance"] != None:
+        self._dropChance.config(text = CreatureView.DROP_CHANCE.format(newDrop["equipChance"]))
+      if newDrop["notes"] != None:
+        utility.update_text(self._dropNotes, newDrop["notes"])
+
+  def _preview_attack(self, *args, **kwargs):
+    # first reset all
+    self._attackPreview.set_defaults()
+    # update with new values
+    if self._data == None or self._attacksCombo.current() == -1:
+      return
+    newAttack = self._data["attacks"][self._attacksCombo.current()]
+    if newAttack != None:
+      self._attackPreview.populate(newAttack)
+
+  def _preview_inhabit(self, *args, **kwargs):
+    # first reset all
+    self._inhabitsPreview.set_defaults()
+    utility.update_text(self._inhabitsNotes, BaseView.EMPTY_STR)
+    # update with new values
+    if self._data == None or self._inhabitsCombo.current() == -1:
+      return
+    newInhabits = self._data["inhabits"][self._inhabitsCombo.current()]
+    if newInhabits != None:
+      self._inhabitsPreview.populate(newInhabits["location"])
+      if newInhabits["notes"] != None:
+        utility.update_text(self._inhabitsNotes, newInhabits["notes"])
 # CreatureView
 ################
 
@@ -323,7 +407,7 @@ if __name__ == "__main__":
   root = Tk()
 
   dbm = DatabaseManager("../data/dnd_ref_book.db", "../data/img/")
-  dbm.reset("../src/tables.sql", "../src/real.sql")
+  # dbm.reset("../src/tables.sql", "../src/real.sql")
   nb = Notebook(root)
   cv = CreatureView(nb)
   nb.add(cv, text = "Default")
