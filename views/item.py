@@ -69,7 +69,7 @@ class ItemView(BaseView):
       if k == "img":
         if v == None:
           v = BaseView.DEFAULT_IMG
-        utility.update_img(self._imgLabel, v)
+        utility.update_img(self._imgLabel, v, maxSize = 300)
       if k == "name":
         self._nameLabel.config(text = v)
       elif k == "description":
@@ -99,7 +99,7 @@ class ItemView(BaseView):
       # TODO: handle other cases
 
   def set_defaults(self):
-    utility.update_img(self._imgLabel, BaseView.DEFAULT_IMG)
+    utility.update_img(self._imgLabel, BaseView.DEFAULT_IMG, maxSize = 300)
     utility.update_text(self._descText, BaseView.DEFAULT)
     utility.update_text(self._notesText, BaseView.DEFAULT)
 # ItemView
