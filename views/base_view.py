@@ -37,6 +37,8 @@ class BaseView(Frame):
   NORMAL_FONT = ("Calibri", 10)
   BOLD_FONT   = ("Calibri", 10, "bold")
 
+  ########
+  # Creates widgets and, if given data, populates them.
   def __init__(self, master, data = None, omniscient = True):
     super().__init__(master)
     self._data = data
@@ -47,11 +49,18 @@ class BaseView(Frame):
     else:
       self.set_defaults()
 
+  ########
+  # Initializes and places all GUI elements.
   def _create_widgets(self):
     pass
 
+  ########
+  # Populates all GUI elements with new data.
   def populate(self, data):
+    self._data = data
     pass
 
+  ########
+  # Resets GUI elements to default values.
   def set_defaults(self):
     pass

@@ -36,6 +36,10 @@ class SimpleStoreView(BaseView):
     self._valueLabel.grid(row = 0, column = 3, sticky = W)
 
   def populate(self, data):
+    self._data = data
+    if data == None:
+      self.set_defaults()
+      return
     name = ""
     itemType = 0
     for k, v in data.items():

@@ -9,8 +9,8 @@
 from tkinter import *
 from tkinter.ttk import Separator, Combobox
 from base_view import BaseView
-from item import SimpleItemView
-from attack import SimpleAttackView
+from simple_item import SimpleItemView
+from simple_attack import SimpleAttackView
 from location import SimpleLocationView
 import utility
 
@@ -234,10 +234,10 @@ class CreatureView(BaseView):
   ########
   # Populates all GUI elements with new data.
   def populate(self, data):
+    self._data = data
     if data == None: # null check
       self.set_defaults()
       return
-    self._data = data
     for k, v in data.items():
       if k == "img":
         if v == None: # null check
@@ -307,6 +307,8 @@ class CreatureView(BaseView):
     utility.update_combobox(self._attacksCombo, [])
     utility.update_combobox(self._inhabitsCombo, [])
 
+  ########
+  # Updates equipment preview.
   def _preview_equip(self, *args, **kwargs):
     # first reset all
     self._equipPreview.set_defaults()
@@ -323,6 +325,8 @@ class CreatureView(BaseView):
       if newEquip["notes"] != None:
         utility.update_text(self._equipNotes, newEquip["notes"])
 
+  ########
+  # Updates drop preview.
   def _preview_drop(self, *args, **kwargs):
     # first reset all
     self._dropPreview.set_defaults()
@@ -339,6 +343,8 @@ class CreatureView(BaseView):
       if newDrop["notes"] != None:
         utility.update_text(self._dropNotes, newDrop["notes"])
 
+  ########
+  # Updates attack preview.
   def _preview_attack(self, *args, **kwargs):
     # first reset all
     self._attackPreview.set_defaults()
@@ -349,6 +355,8 @@ class CreatureView(BaseView):
     if newAttack != None:
       self._attackPreview.populate(newAttack)
 
+  ########
+  # Updates habitat preview.
   def _preview_inhabit(self, *args, **kwargs):
     # first reset all
     self._inhabitsPreview.set_defaults()
@@ -364,45 +372,12 @@ class CreatureView(BaseView):
 # CreatureView
 ################
 
-################
-# Tkinter representation of simple creature object, used for previews.
-class SimpleCreatureView(BaseView):
-
-  NAME_FORMAT = "{} ({})"
-
-  def _create_widgets(self):
-    self._imgLabel = Label(self)
-    self._nameLabel = Label(self, text = SimpleCreatureView.NAME_FORMAT.format("Name", BaseView.DEFAULT))
-
-    self._imgLabel.grid(  row = 0, column = 0, sticky = N+W+E+S)
-    self._nameLabel.grid( row = 0, column = 1, sticky = W)
-
-  def populate(self, data):
-    name = ""
-    hd = BaseView.DEFAULT
-    for k, v in data.items():
-      if k == "name":
-        name = v
-      elif k == "img":
-        if v == None:
-          v = BaseView.DEFAULT_IMG
-        utility.update_img(self._imgLabel, v, maxSize = 30)
-      elif k == "hd":
-        if v != None:
-          hd = v
-    self._nameLabel.config(text = SimpleCreatureView.NAME_FORMAT.format(name, hd))
-
-  def set_defaults(self):
-    utility.update_img(self._imgLabel, BaseView.DEFAULT_IMG, maxSize = 30)
-    self._nameLabel.config(text = SimpleCreatureView.NAME_FORMAT.format("Name", BaseView.DEFAULT))
-# SimpleCreatureView
-################
-
 ########
 # Test code
 if __name__ == "__main__":
   from DnDReferenceBook.src.dbase_manager import DatabaseManager
   from tkinter.ttk import Notebook
+  from simple_creature import SimpleCreatureView
 
   root = Tk()
 

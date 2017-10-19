@@ -8,6 +8,7 @@
 
 from tkinter import *
 from PIL import Image, ImageTk
+from base_view import BaseView
 
 ########
 # Replaces text in a static view
@@ -18,7 +19,11 @@ def update_text(widget, value):
   widget.config(state = DISABLED)
 
 def update_img(widget, filepath, maxSize = 300):
-  img = Image.open(filepath)
+  img = None
+  try:
+    img = Image.open(filepath)
+  except Exception:
+    img = Image.open(BaseView.DEFAULT_IMG)
   newSize = list(img.size)
   if newSize[0] > maxSize:
     ratio = newSize[0] / maxSize 
