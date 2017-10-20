@@ -141,6 +141,8 @@ class StoreView(BaseView):
       elif k == "sells":
         self._update_inventory()
 
+  ########
+  # Resets GUI elements to default values.
   def set_defaults(self):
     utility.update_img(self._imgLabel, BaseView.DEFAULT_IMG, maxSize = 300)
     utility.update_text(self._descText, BaseView.EMPTY_STR)
