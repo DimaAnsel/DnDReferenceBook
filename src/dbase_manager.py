@@ -12,14 +12,14 @@ import sqlite3
 class DatabaseManager:
 
   # Selects specific columns from ALL rows from a given table.
-  SELECT_ALL_ROWS_FILT_COLS = "SELECT {} FROM {}"
+  SELECT_ALL_ROWS_FILT_COLS = "SELECT {} FROM {};"
   # Selects ALL columns from specific rows from a given table.
-  SELECT_FILT_ROWS_ALL_COLS = "SELECT * FROM {} WHERE {} == {}"
+  SELECT_FILT_ROWS_ALL_COLS = "SELECT * FROM {} WHERE {} == {};"
   # Selects specific columns from specific rows from a given table.
-  SELECT_FILT_ROWS_COLS = "SELECT {} FROM {} WHERE {} == {}"
+  SELECT_FILT_ROWS_COLS = "SELECT {} FROM {} WHERE {} == {};"
   # Selects specific columns from specific rows from a given table. More generic
   # than SELECT_FILT_ROWS_COLS
-  SELECT_FILT_ROWS_COLS_SPECIAL = "SELECT {} FROM {} WHERE {}"
+  SELECT_FILT_ROWS_COLS_SPECIAL = "SELECT {} FROM {} WHERE {};"
   # Equals filter.
   FILT_EQUALS = "{} == {}"
   # And filter used in join commands.
@@ -756,7 +756,7 @@ class DatabaseManager:
   # @return List of simple stores.
   def get_store_list(self):
     rawData = self._fetch_raw(DatabaseManager.SELECT_ALL_ROWS_FILT_COLS.format(
-      "(name,location)",
+      "name,location",
       "Stores"))
     toRet = []
     for item in rawData:

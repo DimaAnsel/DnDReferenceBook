@@ -11,7 +11,7 @@ from base_view import BaseView
 import utility
 from simple_creature import SimpleCreatureView
 from simple_item import SimpleItemView
-from store import SimpleStoreView
+from simple_store import SimpleStoreView
 from simple_attack import SimpleAttackView
 from tkinter.ttk import Combobox, Separator
 
@@ -251,7 +251,7 @@ class ItemView(BaseView):
     # placement: armor frame
     self._acLabel.grid(   row = 0, column = 0,                 sticky = N+W)
     self._armorSep1.grid( row = 0, column = 1,                 sticky = N+E+S)
-    self._armorSlot.grid( row = 0, column = 1,                 sticky = E)
+    self._armorSlot.grid( row = 0, column = 2,                 sticky = E)
     self._armorSep2.grid( row = 1, column = 0, columnspan = 3, sticky = W+E)
 
     # placement: consumable frame
@@ -487,7 +487,7 @@ class ItemView(BaseView):
       return
     newSoldAt = self._data["soldAt"][self._soldAtCombo.current()]
     if newSoldAt != None:
-      self._soldAtPreview.populate[newSoldAt["store"]]
+      self._soldAtPreview.populate(newSoldAt["store"])
       self._soldAtPrice.config(text = ItemView.PRICE.format(newSoldAt["price"]))
       self._soldAtQty.config(text = ItemView.QTY.format(newSoldAt["qty"]))
       self._stockDays.config(text = ItemView.STOCK_DAYS.format(newSoldAt["stockDays"]))
@@ -516,25 +516,21 @@ if __name__ == "__main__":
 
   dbm = DatabaseManager("../data/dnd_ref_book.db", "../data/img/")
   # dbm.reset("../src/tables.sql", "../src/real.sql")
+  itemList = dbm.get_item_list()
+
   nb = Notebook(root)
   av = ItemView(nb)
   nb.add(av, text = "Default")
-  av2 = ItemView(nb, dbm.get_item("Animating Crystal"))
-  nb.add(av2, text = "Animating Crystal")
-  av3 = ItemView(nb, dbm.get_item("Volatile Crystal"))
-  nb.add(av3, text = "Volatile Crystal")
-  av4 = ItemView(nb, dbm.get_item("Rock Staff"))
-  nb.add(av4, text = "Rock Staff")
+  for item in itemList:
+    temp = ItemView(nb, dbm.get_item(item["name"]))
+    nb.add(temp, text = item["name"])
   nb.grid(row = 0, column = 0)
 
   top = Toplevel(root)
   sav = SimpleItemView(top)
   sav.grid(row = 0, column = 0, sticky = W+E)
-  sav2 = SimpleItemView(top, dbm.get_simple_item("Animating Crystal"))
-  sav2.grid(row = 1, column = 0, sticky = W+E)
-  sav3 = SimpleItemView(top, dbm.get_simple_item("Volatile Crystal"))
-  sav3.grid(row = 2, column = 0, sticky = W+E)
-  sav4 = SimpleItemView(top, dbm.get_simple_item("Rock Staff"))
-  sav4.grid(row = 3, column = 0, sticky = W+E)
+  for i in range(len(itemList)):
+    temp = SimpleItemView(top, dbm.get_simple_item(itemList[i]["name"]))
+    temp.grid(row = i + 1, column = 0, sticky = W+E)
 
   root.mainloop()

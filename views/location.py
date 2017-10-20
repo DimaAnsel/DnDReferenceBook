@@ -17,51 +17,6 @@ class LocationView(BaseView):
 # LocationView
 ################
 
-################
-# Tkinter representation of simple location object, used for previews.
-class SimpleLocationView(BaseView):
-
-  NAME_FORMAT = "{} ({})"
-
-  def _create_widgets(self):
-    self._imgLabel = Label(self)
-    self._nameLabel = Label(self, text = SimpleLocationView.NAME_FORMAT.format("Name", BaseView.DEFAULT))
-    self._valueImg = Label(self)
-    utility.update_img(self._valueImg, LocationView.VALUE_IMG, maxSize = 30)
-    self._valueLabel = Label(self)
-
-    self._imgLabel.grid(  row = 0, column = 0, sticky = N+W+E+S)
-    self._nameLabel.grid( row = 0, column = 1, sticky = W)
-    self._valueImg.grid(  row = 0, column = 2, sticky = N+W+E+S)
-    self._valueLabel.grid(row = 0, column = 3, sticky = W)
-
-  def populate(self, data):
-    name = ""
-    itemType = 0
-    for k, v in data.items():
-      if k == "name":
-        name = v
-      elif k == "img":
-        if v == None:
-          v = BaseView.DEFAULT_IMG
-        utility.update_img(self._imgLabel, v, maxSize = 30)
-      elif k == "type":
-        if v != None:
-          itemType = v
-      elif k == "value":
-        if v == None:
-          v = BaseView.DEFAULT
-        self._valueLabel.config(text = v)
-    self._nameLabel.config(text = SimpleLocationView.NAME_FORMAT.format(name, LocationView.TYPE_MAP[itemType]))
-
-
-  def set_defaults(self):
-    utility.update_img(self._imgLabel, BaseView.DEFAULT_IMG, maxSize = 30)
-    self._nameLabel.config(text = SimpleLocationView.NAME_FORMAT.format("Name", BaseView.DEFAULT))
-    self._valueLabel.config(text = BaseView.DEFAULT)
-# SimpleLocationView
-################
-
 ########
 # Test code
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ from tkinter.ttk import Separator, Combobox
 from base_view import BaseView
 from simple_item import SimpleItemView
 from simple_attack import SimpleAttackView
-from location import SimpleLocationView
+from simple_location import SimpleLocationView
 import utility
 
 ################

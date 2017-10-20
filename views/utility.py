@@ -19,6 +19,11 @@ def update_text(widget, value):
   widget.config(state = DISABLED)
 
 def update_img(widget, filepath, maxSize = 300):
+  tkImg = get_img(filepath, maxSize)
+  widget.config(image = tkImg)
+  widget.photo = tkImg
+
+def get_img(filepath, maxSize = 300):
   img = None
   try:
     img = Image.open(filepath)
@@ -35,9 +40,8 @@ def update_img(widget, filepath, maxSize = 300):
     newSize[0] = int(newSize[0] / ratio)
   if newSize[0] != img.size[0]:
     img = img.resize(tuple(newSize))
-  tkImg = ImageTk.PhotoImage(img)
-  widget.config(image = tkImg)
-  widget.photo = tkImg
+  return ImageTk.PhotoImage(img)
+
 
 def update_combobox(widget, values):
   widget.config(state = NORMAL)
