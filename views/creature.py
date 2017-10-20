@@ -383,29 +383,21 @@ if __name__ == "__main__":
 
   dbm = DatabaseManager("../data/dnd_ref_book.db", "../data/img/")
   # dbm.reset("../src/tables.sql", "../src/real.sql")
+  creatureList = dbm.get_creature_list()
+
   nb = Notebook(root)
   cv = CreatureView(nb)
   nb.add(cv, text = "Default")
-  cv2 = CreatureView(nb, dbm.get_creature("Flame Wisp"))
-  nb.add(cv2, text = "Flame Wisp")
-  cv3 = CreatureView(nb, dbm.get_creature("Apprentice Rock Elementalist"))
-  nb.add(cv3, text = "Apprentice Rock Elementalist")
-  cv4 = CreatureView(nb, dbm.get_creature("Crystalline Serpent"))
-  nb.add(cv4, text = "Crystalline Serpent")
-  cv5 = CreatureView(nb, dbm.get_creature("Rock Elemental"))
-  nb.add(cv5, text = "Rock Elemental")
+  for creature in creatureList:
+    temp = CreatureView(nb, dbm.get_creature(creature["name"]))
+    nb.add(temp, text = creature["name"])
   nb.grid(row = 0, column = 0)
 
   top = Toplevel(root)
   scv = SimpleCreatureView(top)
   scv.grid(row = 0, column = 0, sticky = W+E)
-  scv2 = SimpleCreatureView(top, dbm.get_creature("Flame Wisp"))
-  scv2.grid(row = 1, column = 0, sticky = W+E)
-  scv3 = SimpleCreatureView(top, dbm.get_creature("Apprentice Rock Elementalist"))
-  scv3.grid(row = 2, column = 0, sticky = W+E)
-  scv4 = SimpleCreatureView(top, dbm.get_creature("Crystalline Serpent"))
-  scv4.grid(row = 3, column = 0, sticky = W+E)
-  scv5 = SimpleCreatureView(top, dbm.get_creature("Rock Elemental"))
-  scv5.grid(row = 4, column = 0, sticky = W+E)
+  for i in range(len(creatureList)):
+    temp = SimpleCreatureView(top, dbm.get_simple_creature(creatureList[i]["name"]))
+    temp.grid(row = i + 1, column = 0, sticky = W+E)
 
   root.mainloop()
