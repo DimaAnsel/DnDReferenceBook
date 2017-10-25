@@ -277,7 +277,6 @@ class CreatureView(BaseView):
         if v == None: # null check
           v = BaseView.DEFAULT
         self._basicAttack.config(text = CreatureView.BASIC_ATTACK.format(v))
-      # TODO: handle other cases
       elif k == "equips":
         if v == None: # null check
           v = []
