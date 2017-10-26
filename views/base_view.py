@@ -41,6 +41,7 @@ class BaseView(Frame):
   # Creates widgets and, if given data, populates them.
   def __init__(self, master, data = None, omniscient = True):
     super().__init__(master)
+    self._ref_book = master
     self._data = data
     self._omniscient = omniscient
     self._create_widgets()

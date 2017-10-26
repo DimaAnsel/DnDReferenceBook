@@ -70,7 +70,7 @@ class StoreView(BaseView):
                                    columns = ["type", "price", "qty", "stockDays"],
                                    selectmode = "browse",
                                    height = 15)
-    self._inventory.heading("#0",         text = "Item")
+    self._inventory.heading("#0",         text = "Item",        anchor = N+W)
     self._inventory.column( "#0",         width = 300,          anchor = N+W, stretch = True)
     self._inventory.heading("type",       text = "Type",        anchor = N+W)
     self._inventory.column( "type",       width = 100,           anchor = N+W)
