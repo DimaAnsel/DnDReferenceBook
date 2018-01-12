@@ -280,7 +280,7 @@ class RefBook(Frame):
   def _store_on_double_click(self, *args, **kwargs):
     if len(self._storeTree.selection()) == 0:
       return
-    curr = self._storeList[self._storeTree.index(self._itemTree.selection())]
+    curr = self._storeList[self._storeTree.index(self._storeTree.selection())]
     self.show_store(curr["name"], curr["location"])
 
   ########
@@ -311,14 +311,16 @@ class RefBook(Frame):
       # TODO: make this cleaner
       try:
         self._openItems[name].lift()
+        self._openItems[name].focus_set()
         return
       except TclError:
         pass # fallthrough to make new window
     newWindow = Toplevel(self)
-    itemView = ItemView(newWindow, self._dbm.get_item(name))
+    itemView = ItemView(newWindow, self._dbm.get_item(name), refBook = self)
     itemView.grid(row = 0, column = 0, sticky = N+W+E+S)
     newWindow.title(name)
     newWindow.lift()
+    newWindow.focus_set()
     self._openItems[name] = newWindow
 
   ########
@@ -329,14 +331,16 @@ class RefBook(Frame):
       # TODO: make this cleaner
       try:
         self._openStores[key].lift()
+        self._openStores[key].focus_set()
         return
       except TclError:
         pass # fallthrough to make new window
     newWindow = Toplevel(self)
-    storeView = StoreView(newWindow, self._dbm.get_store(name, location))
+    storeView = StoreView(newWindow, self._dbm.get_store(name, location), refBook = self)
     storeView.grid(row = 0, column = 0, sticky = N+W+E+S)
     newWindow.title(name)
     newWindow.lift()
+    newWindow.focus_set()
     self._openStores[key] = newWindow
 
   ########
@@ -346,15 +350,17 @@ class RefBook(Frame):
       # TODO: make this cleaner
       try:
         self._openAttacks[attackId].lift()
+        self._openAttacks[attackId].focus_set()
         return
       except TclError:
         pass # fallthrough to make new window
     attack = self._dbm.get_attack(attackId)
     newWindow = Toplevel(self)
-    attackView = AttackView(newWindow, self._dbm.get_attack(attackId))
+    attackView = AttackView(newWindow, self._dbm.get_attack(attackId), refBook = self)
     attackView.grid(row = 0, column = 0, sticky = N+W+E+S)
     newWindow.title("{} ({})".format(attack["name"], attack["id"]))
     newWindow.lift()
+    newWindow.focus_set()
     self._openAttacks[attackId] = newWindow
 
   ########
@@ -364,14 +370,16 @@ class RefBook(Frame):
       # TODO: make this cleaner
       try:
         self._openCreatures[name].lift()
+        self._openCreatures[name].focus_set()
         return
       except TclError:
         pass # fallthrough to make new window
     newWindow = Toplevel(self)
-    creatureView = CreatureView(newWindow, self._dbm.get_creature(name))
+    creatureView = CreatureView(newWindow, self._dbm.get_creature(name), refBook = self)
     creatureView.grid(row = 0, column = 0, sticky = N+W+E+S)
     newWindow.title(name)
     newWindow.lift()
+    newWindow.focus_set()
     self._openCreatures[name] = newWindow
 
   ########
@@ -381,14 +389,16 @@ class RefBook(Frame):
       # TODO: make this cleaner
       try:
         self._openLocations[name].lift()
+        self._openLocations[name].focus_set()
         return
       except TclError:
         pass # fallthrough to make new window
     newWindow = Toplevel(self)
-    locationView = LocationView(newWindow, self._dbm.get_location(name))
+    locationView = LocationView(newWindow, self._dbm.get_location(name), refBook = self)
     locationView.grid(row = 0, column = 0, sticky = N+W+E+S)
     newWindow.title(name)
     newWindow.lift()
+    newWindow.focus_set()
     self._openLocations[name] = newWindow
 
 # RefBook

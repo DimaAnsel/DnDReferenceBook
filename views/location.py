@@ -86,12 +86,6 @@ class LocationView(BaseView):
                                     command = self._notesText.yview)
     self._notesText.config(yscrollcommand = self._notesScroll.set)
 
-
-    # bindings
-    self._storeVar.trace('w', self._preview_store)
-    self._inhabitantVar.trace('w', self._preview_inhabitant)
-
-
     # placement: scrollbars
     self._inhabitantNotes.grid(       row = 0, column = 0, sticky = N+W+E+S)
     self._inhabitantNotesScroll.grid( row = 0, column = 1, sticky = N+S)
@@ -121,6 +115,16 @@ class LocationView(BaseView):
 
     self._leftFrame.grid(    row = 0, column = 0,                 sticky = N+W)
     self._rightFrame.grid(   row = 0, column = 1,                 sticky = N+W)
+
+
+  ########
+  # Add callbacks for all GUI element events and Tkinter variables.
+  def _bind_widgets(self):
+    self._storeVar.trace('w', self._preview_store)
+    self._inhabitantVar.trace('w', self._preview_inhabitant)
+
+    self._storePreview.bind(      "<Double-Button-1>", self._open_store)
+    self._inhabitantPreview.bind( "<Double-Button-1>", self._open_inhabitant)
 
   ########
   # Populates all GUI elements with new data.
@@ -190,6 +194,22 @@ class LocationView(BaseView):
       self._inhabitantPreview.populate(newInhabitant["creature"])
       if newInhabitant["notes"] != None:
         utility.update_text(self._inhabitantNotes, newInhabitant["notes"])
+
+  ########
+  # Opens store view through refBook.
+  def _open_store(self, *args, **kwargs):
+    idx = self._storeCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["stores"]) == 0:
+      return
+    self._refBook.show_store(self._data["stores"][idx]["name"], self._data["name"])
+
+  ########
+  # Opens creature view through refBook.
+  def _open_inhabitant(self, *args, **kwargs):
+    idx = self._inhabitantCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["creatures"]) == 0:
+      return
+    self._refBook.show_creature(self._data["creatures"][idx]["creature"]["name"])
 # LocationView
 ################
 

@@ -224,12 +224,18 @@ class CreatureView(BaseView):
     self._leftFrame.grid(    row = 0, column = 0,                 sticky = N+W)
     self._rightFrame.grid(   row = 0, column = 1,                 sticky = N+W)
 
-
-    # bindings
+  ########
+  # Add callbacks for all GUI element events and Tkinter variables.
+  def _bind_widgets(self):
     self._equipVar.trace('w', self._preview_equip)
     self._dropVar.trace('w', self._preview_drop)
     self._attacksVar.trace('w', self._preview_attack)
     self._inhabitsVar.trace('w', self._preview_inhabit)
+
+    self._equipPreview.bind(    "<Double-Button-1>", self._open_equip)
+    self._dropPreview.bind(     "<Double-Button-1>", self._open_drop)
+    self._attackPreview.bind(   "<Double-Button-1>", self._open_attack)
+    self._inhabitsPreview.bind( "<Double-Button-1>", self._open_inhabits)
 
   ########
   # Populates all GUI elements with new data.
@@ -368,6 +374,38 @@ class CreatureView(BaseView):
       self._inhabitsPreview.populate(newInhabits["location"])
       if newInhabits["notes"] != None:
         utility.update_text(self._inhabitsNotes, newInhabits["notes"])
+
+  #########
+  # Opens item view through refBook.
+  def _open_equip(self, *args, **kwargs):
+    idx = self._equipCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["equips"]) == 0:
+      return
+    self._refBook.show_item(self._data["equips"][idx]["item"]["name"])
+
+  #########
+  # Opens item view through refBook.
+  def _open_drop(self, *args, **kwargs):
+    idx = self._dropCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["drops"]) == 0:
+      return
+    self._refBook.show_item(self._data["drops"][idx]["item"]["name"])
+
+  #########
+  # Opens attack view through refBook.
+  def _open_attack(self, *args, **kwargs):
+    idx = self._attacksCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["attacks"]) == 0:
+      return
+    self._refBook.show_attack(self._data["attacks"][idx]["id"])
+
+  #########
+  # Opens location view through refBook.
+  def _open_inhabits(self, *args, **kwargs):
+    idx = self._inhabitsCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["inhabits"]) == 0:
+      return
+    self._refBook.show_location(self._data["inhabits"][idx]["location"]["name"])
 # CreatureView
 ################
 

@@ -23,6 +23,13 @@ class SimpleStoreView(BaseView):
     self._imgLabel.grid(  row = 0, column = 0, sticky = N+W+E+S)
     self._nameLabel.grid( row = 0, column = 1, sticky = W)
 
+  ########
+  # Extends Tkinter bind functionality to child widgets.
+  def bind(self, *args, **kwargs):
+    super().bind(*args, **kwargs)
+    self._imgLabel.bind(*args, **kwargs)
+    self._nameLabel.bind(*args, **kwargs)
+
   def populate(self, data):
     self._data = data
     if data == None:

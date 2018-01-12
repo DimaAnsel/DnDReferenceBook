@@ -126,10 +126,16 @@ class AttackView(BaseView):
     self._leftFrame.grid(    row = 0, column = 0,                 sticky = N+W)
     self._rightFrame.grid(   row = 0, column = 1,                 sticky = N+W)
 
-    # bindings
+  ########
+  # Add callbacks for all GUI element events and Tkinter variables.
+  def _bind_widgets(self):
     self._creatureVar.trace('w', self._preview_creature)
     self._weaponVar.trace('w', self._preview_weapon)
     self._costVar.trace('w', self._preview_cost)
+
+    self._creaturePreview.bind( "<Double-Button-1>", self._open_creature)
+    self._weaponPreview.bind(   "<Double-Button-1>", self._open_weapon)
+    self._costPreview.bind(     "<Double-Button-1>", self._open_cost)
 
   ########
   # Populates all GUI elements with new data.
@@ -243,6 +249,30 @@ class AttackView(BaseView):
       self._costPreview.populate(newCost["item"])
       if newCost["qty"] != None:
         self._costQtyLabel.config(text = AttackView.QTY.format(newCost["qty"]))
+
+  #########
+  # Opens creature view through refBook.
+  def _open_creature(self, *args, **kwargs):
+    idx = self._creatureCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["creatures"]) == 0:
+      return
+    self._refBook.show_item(self._data["creatures"][idx]["name"])
+
+  #########
+  # Opens item view through refBook.
+  def _open_weapon(self, *args, **kwargs):
+    idx = self._weaponCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["weapons"]) == 0:
+      return
+    self._refBook.show_item(self._data["weapons"][idx]["name"])
+
+  #########
+  # Opens item view through refBook.
+  def _open_cost(self, *args, **kwargs):
+    idx = self._costCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["costs"]) == 0:
+      return
+    self._refBook.show_item(self._data["costs"][idx]["item"]["name"])
 # AttackView
 ################
 

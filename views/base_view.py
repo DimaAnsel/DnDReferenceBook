@@ -39,12 +39,13 @@ class BaseView(Frame):
 
   ########
   # Creates widgets and, if given data, populates them.
-  def __init__(self, master, data = None, omniscient = True):
+  def __init__(self, master, data = None, refBook = None, omniscient = True):
     super().__init__(master)
-    self._ref_book = master
+    self._refBook = refBook
     self._data = data
     self._omniscient = omniscient
     self._create_widgets()
+    self._bind_widgets()
     if data != None:
       self.populate(data)
     else:
@@ -53,6 +54,11 @@ class BaseView(Frame):
   ########
   # Initializes and places all GUI elements.
   def _create_widgets(self):
+    pass
+
+  ########
+  # Add callbacks for all GUI element events and Tkinter variables.
+  def _bind_widgets(self):
     pass
 
   ########

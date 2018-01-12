@@ -307,13 +307,22 @@ class ItemView(BaseView):
     self._leftFrame.grid(    row = 0, column = 0,                 sticky = N+W)
     self._rightFrame.grid(   row = 0, column = 1,                 sticky = N+W)
 
-    # bindings
+  ########
+  # Add callbacks for all GUI element events and Tkinter variables.
+  def _bind_widgets(self):
     self._equipVar.trace('w', self._preview_equip)
     self._dropVar.trace('w', self._preview_drop)
     self._ammoVar.trace('w', self._preview_ammo)
     self._spellVar.trace('w', self._preview_spell)
     self._soldAtVar.trace('w', self._preview_sold_at)
     self._weaponAttackVar.trace('w', self._preview_weapon_attack)
+
+    self._equipPreview.bind(        "<Double-Button-1>", self._open_equip)
+    self._dropPreview.bind(         "<Double-Button-1>", self._open_drop)
+    self._ammoPreview.bind(         "<Double-Button-1>", self._open_ammo)
+    self._spellPreview.bind(        "<Double-Button-1>", self._open_spell)
+    self._soldAtPreview.bind(       "<Double-Button-1>", self._open_soldAt)
+    self._weaponAttackPreview.bind( "<Double-Button-1>", self._open_weaponAttack)
 
   ########
   # Populates all GUI elements with new data.
@@ -503,6 +512,54 @@ class ItemView(BaseView):
     newAttack = self._data["attacks"][self._weaponAttackCombo.current()]
     if newAttack != None:
       self._weaponAttackPreview.populate(newAttack)
+
+  #########
+  # Opens item view through refBook.
+  def _open_equip(self, *args, **kwargs):
+    idx = self._equipCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["equippedBy"]) == 0:
+      return
+    self._refBook.show_creature(self._data["equippedBy"][idx]["creature"]["name"])
+
+  #########
+  # Opens item view through refBook.
+  def _open_drop(self, *args, **kwargs):
+    idx = self._dropCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["droppedBy"]) == 0:
+      return
+    self._refBook.show_creature(self._data["droppedBy"][idx]["creature"]["name"])
+
+  #########
+  # Opens item view through refBook.
+  def _open_ammo(self, *args, **kwargs):
+    idx = self._ammoCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["ammoFor"]) == 0:
+      return
+    self._refBook.show_item(self._data["ammoFor"][idx]["name"])
+
+  #########
+  # Opens attack view through refBook.
+  def _open_spell(self, *args, **kwargs):
+    idx = self._spellCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["spellCost"]) == 0:
+      return
+    self._refBook.show_attack(self._data["spellCost"][idx]["spell"]["id"])
+
+  #########
+  # Opens store view through refBook.
+  def _open_soldAt(self, *args, **kwargs):
+    idx = self._soldAtCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["soldAt"]) == 0:
+      return
+    self._refBook.show_store(self._data["soldAt"][idx]["store"]["name"], self._data["soldAt"][idx]["store"]["location"])
+
+  #########
+  # Opens weapon view through refBook.
+  def _open_weaponAttack(self, *args, **kwargs):
+    idx = self._weaponAttackCombo.current()
+    if self._refBook == None or self._data == None or idx == -1 or len(self._data["attacks"]) == 0:
+      return
+    self._refBook.show_attack(self._data["attacks"][idx]["id"])
 # ItemView
 ################
 

@@ -27,6 +27,14 @@ class SimpleItemView(BaseView):
     if self._omniscient:
       self._valueLabel.grid(row = 0, column = 2, sticky = W)
 
+  ########
+  # Extends Tkinter bind functionality to child widgets.
+  def bind(self, *args, **kwargs):
+    super().bind(*args, **kwargs)
+    self._imgLabel.bind(*args, **kwargs)
+    self._nameLabel.bind(*args, **kwargs)
+    self._valueLabel.bind(*args, **kwargs)
+
   def populate(self, data):
     self._data = data
     if data == None:

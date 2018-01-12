@@ -113,6 +113,13 @@ class StoreView(BaseView):
     self._rightFrame.grid(   row = 0, column = 1,                 sticky = N+W)
 
   ########
+  # Add callbacks for all GUI element events and Tkinter variables.
+  def _bind_widgets(self):
+
+    self._locPreview.bind("<Double-Button-1>", self._open_loc)
+    self._inventory.bind( "<Double-Button-1>", self._inventory_on_double_click)
+
+  ########
   # Populates all GUI elements with new data.
   def populate(self, data):
     self._data = data
@@ -172,6 +179,20 @@ class StoreView(BaseView):
           fields[i] = BaseView.EMPTY_STR
       self._imgs.append(img)
       self._inventory.insert("", END, image = img, text = name, values = fields)
+
+  ########
+  # Opens location view through refBook.
+  def _open_loc(self, *args, **kwargs):
+    if self._refBook == None or self._data == None:
+      return
+    self._refBook.show_location(self._data["location"]["name"])
+
+  ########
+  # Callback for double clicking in inventory treeview.
+  def _inventory_on_double_click(self, *args, **kwargs):
+    if self._refBook == None or self._data == None or len(self._inventory.selection()) == 0:
+      return
+    self._refBook.show_item(self._data["sells"][self._inventory.index(self._inventory.selection())]["item"]["name"])
 # StoreView
 ################
 
